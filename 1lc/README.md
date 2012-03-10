@@ -30,7 +30,7 @@ Fișierele Prolog pot avea următoarele extensii:
 
 Un program Prolog poate fi compilat și executat astfel:
 
-    u@H:~$ swipl -c FILE.prolog -o FILE && ./FILE
+    u@H:~$ swipl -o PROGRAM -c FILE.prolog && ./PROGRAM
     ?-
     (apasă CTRL^D pentru a termina execuția)
 
