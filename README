@@ -1,27 +1,33 @@
 Informatică, Universitatea din Craiova
 ======================================
 
+
 Anul 1
 ------
-1asd	- Algoritmi și Structuri de Date
-1ac	- Arhitectura Calculatoarelor
-1cs	- Calcul Științific
-1fai	- Fundamentele Algebrice ale Informaticii
-1gcgc	- Geometrie Computațională și Grafică pe Calculator
-1lc	- Logică Computațională
-1poo	- Programare Orientată Obiect
-1pp	- Programare Procedurală
-1so	- Sisteme de Operare
+1asd	- Algoritmi și structuri de date
+1ac	- Arhitectura calculatoarelor
+1cs	- Calcul științific
+1fai	- Fundamentele algebrice ale informaticii
+1pp	- Programare procedurală (C)
+
+1ag	- Algoritmica grafurilor
+1gcgc	- Geometrie computațională și grafică pe calculator
+1lc	- Logică computațională (Prolog)
+1poo	- Programare orientată obiect (C++)
+1so	- Sisteme de operare
+
 
 Anul 2
 ------
-2bd	- Baze de Date
-2cn	- Calcul Numeric
-2ia	- Inteligență Artificială
-2mcsde	- Metode Computaționale în Studiul Dinamicii Economice
-2ps	- Probabilități și Statistică
-2pnp	- Programare Non-Procedurală
-2rc	- Rețele de Calculatoare
-2si	- Securitatea Informației
-2sgbd	- Sisteme de Gestiune a Bazelor de Date
-2tap	- Tehnici Avansate de Programare (Java)
+2bd	- Baze de date
+2ia	- Inteligență artificială
+2ps	- Probabilități și statistică
+2rc	- Rețele de calculatoare
+2is	- Inginerie software
+2si	- Securitatea informației
+
+2cn	- Calcul numeric
+2pnp	- Programare non-procedurală (Lisp)
+2sgbd	- Sisteme de gestiune a bazelor de date
+2tap	- Tehnici avansate de programare (Java)
+2mcsde	- Metode computaționale în studiul dinamicii economice
