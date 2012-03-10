@@ -28,7 +28,7 @@ Fișierele Prolog pot avea următoarele extensii:
 [6]: http://packages.debian.org/gedit
 
 
-Un program Prolog poate fi compilat și executat astfel:
+Un fișier cod sursă Prolog poate fi compilat și executat astfel:
 
     u@H:~$ swipl -o PROGRAM -c FILE.prolog && ./PROGRAM
     ?-
