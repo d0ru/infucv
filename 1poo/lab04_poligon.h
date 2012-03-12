@@ -1,6 +1,7 @@
 /*
- * Poligonul este dat printr-o mulțime de puncte, punctele fiind specificate
- * în ordine trigonometrică.
+ * Să se realizeze o clasă care reprezintă noțiunea de poligon.
+ * Poligonul este dat printr-o mulțime de puncte.
+ * Se presupune că punctele sunt specificate în ordine trigonometrică.
  */
 
 #include "lab04_punct.h"

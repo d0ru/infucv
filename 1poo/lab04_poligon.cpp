@@ -1,7 +1,7 @@
-/* Să se realizeze o clasă care reprezintă noțiunea de poligon.
- * Poligonul este dat printr-o mulțime de puncte, punctele fiind specificate
- * în ordine trigonometrică.
- * Să se scrie o funcție care calculează perimetrul.
+/*
+ * Să se realizeze o clasă care reprezintă noțiunea de poligon.
+ * Poligonul este dat printr-o mulțime de puncte.
+ * Se presupune că punctele sunt specificate în ordine trigonometrică.
  */
 
 #include <iostream>
@@ -10,7 +10,6 @@ using namespace std;
 #include <math.h>
 
 #include "lab04_punct.h"
-#include "lab04_punct.cpp"
 #include "lab04_poligon.h"
 
 
@@ -33,6 +32,10 @@ void poligon::afisare(void)
 {
 	int i;
 
+	if (this->np < 1) {
+		cout << "Poligonul nu are nici un punct." << endl;
+		return;
+	}
 	cout << "Punctele poligonului sunt: " << endl;
 	for (i = 0; i < this->np; i++) {
 		cout << "Punctul «" << i << "»: ";
@@ -51,21 +54,4 @@ float poligon::perimetru(void)
 
 	}
 	return pmetru;
-}
-
-
-int main(void)
-{
-	punct p0, p1(7,6), p2(12), p3=20;
-	poligon P;
-
-	p0.afisare();
-	p1.afisare();
-	p2.afisare();
-	p3.afisare();
-
-	P.citire();
-	P.afisare();
-	cout << P.perimetru();
-	return 0;
 }
