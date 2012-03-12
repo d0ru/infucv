@@ -1,7 +1,5 @@
-/* Să se realizeze o clasă care reprezintă noțiunea de poligon.
- * Poligonul este dat printr-o mulțime de puncte, punctele fiind specificate
- * în ordine trigonometrică.
- * Să se scrie o funcție care calculează perimetrul.
+/*
+ * clasa punct: implementare
  */
 
 #include <iostream>

@@ -1,5 +1,5 @@
 /*
- * clasa punct
+ * clasa punct: definiție
  */
 
 #ifndef __PUNCT__
