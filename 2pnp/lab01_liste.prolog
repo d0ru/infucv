@@ -29,6 +29,12 @@ ultim([X],X).			% sau ultim([X|[]],X).
 ultim([_|Rest],X)	:- ultim(Rest,X).
 
 
+% Să se adauge un element la sfârșitul unei liste.
+
+adaugă(X,[],[X]).
+adaugă(X,[Y|R1],[Y|R2])	:- adaugă(X,R1,R2).
+
+
 % Media aritmetică a tuturor numerelor unei liste.
 
 suma([],0).
