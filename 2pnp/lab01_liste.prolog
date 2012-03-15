@@ -23,18 +23,6 @@ nr_elem_poz([X|Rest],P)	:- X >= 0, nr_elem_poz(Rest,P1), P is P1+1.
 nr_elem_poz([_|Rest],P)	:- nr_elem_poz(Rest,P).
 
 
-% Determinați ultimul element dintr-o listă.
-
-ultim([X],X).			% sau ultim([X|[]],X).
-ultim([_|Rest],X)	:- ultim(Rest,X).
-
-
-% Să se adauge un element la sfârșitul unei liste.
-
-adaugă(X,[],[X]).
-adaugă(X,[Y|R1],[Y|R2])	:- adaugă(X,R1,R2).
-
-
 % Media aritmetică a tuturor numerelor unei liste.
 
 suma([],0).
@@ -55,52 +43,6 @@ suma_poz([_|Rest],S)	:- suma_poz(Rest,S).
 suma_patrate([],0).
 suma_patrate([0|Rest],S):- suma_patrate(Rest,S).
 suma_patrate([X|Rest],S):- P is X*X, suma_patrate(Rest,S1), S is P+S1.
-
-
-% Elementul maxim al unei liste.
-
-maxim([X|Rest])	:- max1(Rest,X).
-max1([],M)	:- write('Elementul maxim este «'), write(M), writeln('».').
-max1([X|Rest],M):- X < M, max1(Rest,M); max1(Rest,X).
-
-max2([M])	:- write('Elementul maxim este «'), write(M), writeln('».').
-max2([X,Y|Rest]):- X >= Y, max2([X|Rest]); max2([Y|Rest]).
-
-max3([M],M).
-max3([X|Rest],M):- max3(Rest,M1), X < M1, M = M1; M = X.
-
-
-% Poziția pe care se află elementul maxim al unei liste.
-% M elementul maxim
-% P poziția elementului maxim curent
-% N poziția elementului curent din listă
-
-poz_maxim([M|Rest])	:- poz_max1(Rest,M,1,1).
-poz_max1([],M,P,N)	:- write('Elementul maxim «'), write(M), write('» se află pe poziția '), write(P), write(' din '), write(N), writeln(' numere.').
-poz_max1([X|Rest],M,P,N):- N1 is N+1, X < M, poz_max1(Rest,M,P,N1).
-poz_max1([X|Rest],_,_,N):- N1 is N+1, poz_max1(Rest,X,N1,N1).
-
-
-% Poziția pe care se află elementul minim al unei liste.
-
-poz_minim([M|Rest])	:- poz_min1(Rest,M,1,1).
-poz_min1([],M,P,N)	:- write('Elementul minim «'), write(M), write('» se află pe poziția '), write(P), write(' din '), write(N), writeln(' numere.').
-poz_min1([X|Rest],M,P,N):- N1 is N+1, X > M, poz_min1(Rest,M,P,N1).
-poz_min1([X|Rest],_,_,N):- N1 is N+1, poz_min1(Rest,X,N1,N1).
-
-
-% Poziția «i» dintr-o listă
-
-poziție([X|_],1,X).
-poziție([_|Rest],I,N)	:- I1 is I-1, poz(Rest,I1,N).
-
-
-% Poziția unui element într-o listă
-
-poziție_elem([],_,0).
-poziție_elem(L,X,P)	:- poz_elem(L,X,1,P).
-poz_elem([X|_],X,P,P).
-poz_elem([_|Rest],X,C,P):- C1 is C+1, poz_elem(Rest,X,C1,P).
 
 
 % Compararea lungimii a două liste
@@ -137,20 +79,6 @@ interclasez([X1|R1],[X2|R2],[X1|R3])	:- X1 < X2, interclasez(R1,[X2|R2],R3).
 interclasez([X1|R1],[X2|R2],[X2|R3])	:- interclasez([X1|R1],R2,R3).
 
 
-% Să se șteargă toate aparițiile unui element dintr-o listă.
-
-sterge_elem([],_,[]).
-sterge_elem([E|Rest],E,LE)	:- sterge_elem(Rest,E,LE).
-sterge_elem([X|Rest],E,[X|LE])	:- sterge_elem(Rest,E,LE).
-
-
-% Eliminarea duplicatelor dintr-o listă.
-
-elim_dup([],[]).
-elim_dup([X|R1],L2)	:- aparține(X,R1), elim_dup(R1,L2).
-elim_dup([X|R1],[X|R2])	:- elim_dup(R1,R2).
-
-
 % Sublista care conține numai pozițiile pare (2, 4, 6, ...) din lista inițială.
 
 poz_pare([],[]).
@@ -166,12 +94,6 @@ poz_pare([_,Y|Rest],[Y|Lpare])	:- poz_pare(Rest,Lpare).
 parimpar([],[],[]).
 parimpar([X],[X],[]).
 parimpar([X,Y|Rest],[X|RImp],[Y|RPar])	:- parimpar(Rest,RImp,RPar).
-
-
-% Verifică dacă două elemente sunt consecutive într-o listă.
-
-cons2([X,Y|_],X,Y).
-cons2([_,_|R],X,Y)	:- cons2(R,X,Y).
 
 
 % Prefixul unei liste: primele N elemente ale unei liste
@@ -190,3 +112,4 @@ sufix(L,[_X|R2])	:- sufix(L,R2).
 % Sublista unei liste: daca este sufixul prefixului listei mari
 
 sublista(L1,L2)		:- prefix(L,L2), sufix(L1,L).
+
