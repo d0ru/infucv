@@ -11,12 +11,12 @@
 #include "gnma.h"
 
 // nrvarf = |V|, numărul vârfurilor grafului neorientat
-int *fcitire_gnma(FILE *file, int *nrvarf)
+int *fcitire_gnma(FILE *fisier, int *nrvarf)
 {
 	int i, j;
 	int *matrice;
 
-	fscanf(file, "%i", nrvarf);
+	fscanf(fisier, "%i", nrvarf);
 	if (*nrvarf <= 0)
 		return NULL;
 	matrice = (int *) malloc(sizeof(int) * (*nrvarf) * (*nrvarf));
@@ -25,7 +25,7 @@ int *fcitire_gnma(FILE *file, int *nrvarf)
 
 	for (i = 0; i < *nrvarf; i++)
 		for (j = 0; j < *nrvarf; j++)
-			fscanf(stdin, "%d", matrice + i*(*nrvarf) + j);
+			fscanf(fisier, "%d", matrice + i*(*nrvarf) + j);
 	return matrice;
 }
 
