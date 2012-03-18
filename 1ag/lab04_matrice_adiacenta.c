@@ -1,6 +1,12 @@
 /*
- * Operații cu matricea de adiacență unui graf neorientat.
- * a[i,j] = 1 dacă există o muchie între vârfurile i și j
+ * Operații cu matricea de adiacență a unui graf neorientat.
+ * a[i,j] = 0 dacă NU există o muchie între vârfurile i și j
+ *
+ * Programul se compilează și se apelează astfel:
+ * $ ./lab04_matrice_adiacenta < graf1.in
+ *
+ * "graf1.in" este un fișier text ce conține pe prima linie numărul nodurilor
+ * și pe celelalte linii matricea de adiacență (0 sau 1 separate prin spațiu)
  */
 
 #include <errno.h>
