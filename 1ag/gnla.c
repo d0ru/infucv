@@ -40,16 +40,16 @@ struct nod *fcitire_gnla(FILE *fisier, int *nrvarf)
 	}
 
 	while (1 == fscanf(fisier, "%i:", &v)) {
-		if (v < 1 || v >= *nrvarf) {
+		if (v < 1 || v > *nrvarf) {
 			fprintf(stderr, "E: număr vârf «%d» incorect, 1 ≤ v ≤ %d!\n", v, *nrvarf);
 			while (EOF != (u = fgetc(fisier)))	// ignoră tot până la sfârșit de linie
 				if ('\n' == u)
 					break;
 			continue;
 		}
-		varf[v].nr = v - 1;			// numerotare vector de la zero
+		varf[v-1].nr = v;			// numerotare vector de la zero
 
-		coada = varf + v;			// elementele sunt introduse în ordinea dată
+		coada = varf + v - 1;			// elementele sunt introduse în ordinea dată
 		fscanf(fisier, "%d", &u);		// lista de vecini îl are cel puțin pe 0
 		while (u > 0) {
 			coada->urm = malloc(sizeof(struct nod));
@@ -77,7 +77,7 @@ void afisare_gnla(const struct nod varf[], int nrvarf)
 	struct nod *pn;
 
 	for (v = 0; v < nrvarf; v++) {
-		printf("%d: ", varf[v].nr);
+		printf("%d:", varf[v].nr);
 		pn = varf[v].urm;
 		while (NULL != pn) {
 			printf(" %d", pn->nr);
