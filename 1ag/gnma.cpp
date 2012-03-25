@@ -10,6 +10,9 @@
 
 #include "gnma.h"
 
+#include <queue>
+using namespace std ;
+
 // nrvarf = |V|, numărul vârfurilor grafului neorientat
 int *fcitire_gnma(FILE *fisier, int *nrvarf)
 {
@@ -75,4 +78,39 @@ bool muchie_gnma(const int *matrice, int nrvarf, int nod1, int nod2)
 		return true;
 	else
 		return false;
+}
+
+// parcurgere în lățime (BFS)
+void vizlat_gnma(const int *matrice, int nrvarf, int nod)
+{
+	int i, k;
+	queue<int> qi;
+	int *vizitat;
+
+	if (nrvarf <= 0)
+		return;
+	vizitat = (int *) calloc(nrvarf, sizeof(int));
+	if (NULL == vizitat)
+		return;
+
+	nod--;					// nodurile sunt numărate de la 1, nu de la 0
+	vizitat[nod] = 1;
+	qi.push(nod);				// Q <= nod
+	printf("%d;", nod+1);			// CALL vizitare(nod)
+
+	while (!qi.empty()) {			// Q ≠ ∅
+		k = qi.front();			// Q => k
+		qi.pop();
+		for (i = 0; i < nrvarf; i++) {
+			if (0 != vizitat[i])	// vârful a fost deja vizitat
+				continue;
+			if (0 == matrice[k*nrvarf + i])
+				continue;	// nu există o muchie (k;i)
+			vizitat[i] = 1;
+			qi.push(i);		// Q <= i
+			printf(" %d;", i+1);	// CALL vizitare(i)
+		}
+	}
+	putchar('\n');
+	free(vizitat);
 }

@@ -3,8 +3,8 @@
  * a[i,j] = 0 dacă NU există o muchie între vârfurile i și j
  */
 
-#ifndef __GNMA__
-#define __GNMA__
+#ifndef INFUCV_GNMA
+#define INFUCV_GNMA
 // GNMA - graf neorientat, matrice de adiacență
 // nrvarf = |V|, numărul vârfurilor grafului neorientat
 int *fcitire_gnma(FILE *file, int *nrvarf);
@@ -23,4 +23,7 @@ void afvec_gnma(const int *matrice, int nrvarf, int nod);
 
 // returnează true dacă nodurile sunt adiacente (formează o muchie)
 bool muchie_gnma(const int *matrice, int nrvarf, int nod1, int nod2);
+
+// parcurgere în lățime (BFS)
+void vizlat_gnma(const int *matrice, int nrvarf, int nod);
 #endif

@@ -7,8 +7,8 @@
  *   sau
  * $ ./lab04_gnma0 gnma3_13.txt
  *
- * "gnma3_13.txt" este un fișier ce conține pe prima linie numărul nodurilor și
- * pe celelalte linii matricea de adiacență (0 sau 1 separate prin spațiu)
+ * "gnma3_13.txt" este un fișier ce conține pe prima linie numărul nodurilor
+ * și pe celelalte linii matricea de adiacență (0 sau 1 separate prin spațiu)
  * Obs: fișierul trebuie să se termine cu \n (new line)
  */
 
@@ -18,7 +18,7 @@
 #include <stdlib.h>
 
 #include "gnma.h"
-#include "gnma.c"
+#include "gnma.cpp"
 
 // operații cu matricea de adiacență a unui graf neorientat
 int main(int argc, char *argv[])
