@@ -6,8 +6,8 @@
  *   sau
  * $ ./lab04_gnla0 gnla3_13.txt
  *
- * "gnla3_13.txt" este un fișier ce conține pe prima linie numărul nodurilor și
- * pe celelalte linii lista de adiacență a grafului neorientat
+ * "gnla3_13.txt" este un fișier ce conține pe prima linie numărul nodurilor
+ * și pe celelalte linii lista de adiacență a grafului neorientat
  * Obs: fișierul trebuie să se termine cu \n (new line)
  */
 
@@ -17,7 +17,7 @@
 #include <stdlib.h>
 
 #include "gnla.h"
-#include "gnla.c"
+#include "gnla.cpp"
 
 // operații cu lista de adiacență a unui graf neorientat
 int main(int argc, char *argv[])

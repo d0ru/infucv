@@ -15,6 +15,10 @@
 
 #include "gnla.h"
 
+#include <queue>
+#include <stack>
+using namespace std;
+
 // nrvarf = |V|, numărul vârfurilor grafului neorientat
 struct nod *fcitire_gnla(FILE *fisier, int *nrvarf)
 {
@@ -52,7 +56,7 @@ struct nod *fcitire_gnla(FILE *fisier, int *nrvarf)
 		coada = varf + v - 1;			// elementele sunt introduse în ordinea dată
 		fscanf(fisier, "%d", &u);		// lista de vecini îl are cel puțin pe 0
 		while (u > 0) {
-			coada->urm = malloc(sizeof(struct nod));
+			coada->urm = (struct nod *) malloc(sizeof(struct nod));
 			if (NULL == coada->urm) {
 				fprintf(stderr, "E: nu s-a putut aloca memorie pentru vecinul «%d» al vârfului «%d»!\n", u, v);
 				continue;
@@ -131,4 +135,107 @@ bool muchie_gnla(const struct nod varf[], int nrvarf, int nod1, int nod2)
 		pn = pn->urm;
 	}
 	return false;
+}
+
+// parcurgere în lățime (BFS)
+void vizlat_gnla(const struct nod varf[], int nrvarf, int nod)
+{
+	int i, k;
+	queue<int> qi;
+	bool *vizitat;				// un vector care reține doar starea vizitat? T/F
+	bool gasit;
+	struct nod *pn;
+
+	if (nrvarf <= 0)
+		return;
+	vizitat = (bool *) malloc(sizeof(bool) * nrvarf);
+	if (NULL == vizitat)
+		return;
+	for (i = 0; i < nrvarf; i++)		// inițial toate vârfurile sunt nevizitate
+		vizitat[i] = false;
+
+	nod--;					// nodurile sunt numărate de la 1, nu de la 0
+	vizitat[nod] = true;
+	qi.push(nod);				// Q <= nod
+	printf("   %d\n", nod+1);		// CALL vizitare(nod)
+
+	while (!qi.empty()) {			// Q ≠ ∅
+		k = qi.front();			// Q => k
+		qi.pop();
+		gasit = false;
+		pn = varf[k].urm;		// parcurg lista de vecini ai lui «k»
+		while (NULL != pn) {
+			i = pn->nr - 1;		// nodurile încep de la 1, nu de la 0
+			if (vizitat[i]) {	// vârful a fost deja vizitat
+				pn = pn->urm;
+				continue;
+			}
+			vizitat[i] = true;
+			qi.push(i);			// Q <= i
+			printf(" → %d", pn->nr);	// CALL vizitare(i)
+			gasit = true;
+			pn = pn->urm;
+		}
+		if (gasit)
+			putchar('\n');
+	}
+	free(vizitat);
+}
+
+// parcurgere în adâncime (DFS)
+void vizad_gnla(const struct nod varf[], int nrvarf, int nod)
+{
+	int i, k, adancime;
+	stack<int> si;
+	bool *vizitat;				// un vector care reține doar starea vizitat? T/F
+	bool gasit, primul;
+	struct nod *pn;
+
+	if (nrvarf <= 0)
+		return;
+	vizitat = (bool *) malloc(sizeof(bool) * nrvarf);
+	if (NULL == vizitat)
+		return;
+	for (i = 0; i < nrvarf; i++)		// inițial toate vârfurile sunt nevizitate
+		vizitat[i] = false;
+
+	nod--;					// nodurile sunt numărate de la 1, nu de la 0
+	vizitat[nod] = true;
+	si.push(nod);				// S <= nod
+	printf("   %d", nod+1);			// CALL vizitare(nod)
+	adancime = 2;				// primul în ierarhie
+
+	gasit = false;				// dacă vârful curent mai are vecini nevizitați
+	primul = false;				// ramură nouă?
+	while (!si.empty()) {			// S ≠ ∅
+		if (!gasit) {
+			k = si.top();		// S => k
+			si.pop();
+			adancime--;
+			if (adancime > 1)
+				primul = true;
+		}
+		gasit = false;
+		pn = varf[k].urm;		// parcurg lista de vecini ai lui «k»
+		while (NULL != pn) {
+			i = pn->nr - 1;		// nodurile încep de la 1, nu de la 0
+			if (vizitat[i]) {	// vârful a fost deja vizitat
+				pn = pn->urm;
+				continue;
+			}
+			vizitat[i] = true;
+			si.push(k);			// S <= k
+			if (primul) {
+				printf("\n%*c", 4*adancime, ' ');
+				primul = false;
+			}
+			printf(" → %d", pn->nr);	// CALL vizitare(i)
+			k = i;
+			adancime++;
+			gasit = true;
+			break;			// am găsit cel puțin un vârf nevizitat adiacent cu k
+		}
+	}
+	putchar('\n');
+	free(vizitat);
 }

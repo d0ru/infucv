@@ -8,8 +8,8 @@
  * nod: listă vecini 0
  */
 
-#ifndef __GNLA__
-#define __GNLA__
+#ifndef INFUCV_GNLA
+#define INFUCV_GNLA
 // GNLA - graf neorientat, listă de adiacență
 
 struct nod {
@@ -34,4 +34,10 @@ void afvec_gnla(const struct nod varf[], int nrvarf, int nod);
 
 // returnează true dacă nodurile sunt adiacente (formează o muchie)
 bool muchie_gnla(const struct nod varf[], int nrvarf, int nod1, int nod2);
+
+// parcurgere în lățime (BFS)
+void vizlat_gnla(const struct nod varf[], int nrvarf, int nod);
+
+// parcurgere în adâncime (DFS)
+void vizad_gnla(const struct nod varf[], int nrvarf, int nod);
 #endif
