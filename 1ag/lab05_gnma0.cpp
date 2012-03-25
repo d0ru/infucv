@@ -44,8 +44,11 @@ int main(int argc, char *argv[])
 	}
 
 	for (i = 1; i <= nr; i++) {
-		printf("Vizitare în lățime GNMA de la vârful «%d»: ", i);
+		printf("Vizitare în lățime GNMA de la vârful «%d»:\n", i);
 		vizlat_gnma(mat, nr, i);
+		printf("Vizitare în adâncime GNMA de la vârful «%d»:\n", i);
+		vizad_gnma(mat, nr, i);
+		putchar('\n');
 	}
 	return 0;
 }
