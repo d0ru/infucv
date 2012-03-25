@@ -26,4 +26,7 @@ bool muchie_gnma(const int *matrice, int nrvarf, int nod1, int nod2);
 
 // parcurgere în lățime (BFS)
 void vizlat_gnma(const int *matrice, int nrvarf, int nod);
+
+// parcurgere în adâncime (DFS)
+void vizad_gnma(const int *matrice, int nrvarf, int nod);
 #endif

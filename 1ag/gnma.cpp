@@ -11,6 +11,7 @@
 #include "gnma.h"
 
 #include <queue>
+#include <stack>
 using namespace std ;
 
 // nrvarf = |V|, numărul vârfurilor grafului neorientat
@@ -85,30 +86,91 @@ void vizlat_gnma(const int *matrice, int nrvarf, int nod)
 {
 	int i, k;
 	queue<int> qi;
-	int *vizitat;
+	bool *vizitat;				// un vector care reține doar starea vizitat? T/F
+	bool gasit;
 
 	if (nrvarf <= 0)
 		return;
-	vizitat = (int *) calloc(nrvarf, sizeof(int));
+	vizitat = (bool *) malloc(sizeof(bool) * nrvarf);
 	if (NULL == vizitat)
 		return;
+	for (i = 0; i < nrvarf; i++)		// inițial toate vârfurile sunt nevizitate
+		vizitat[i] = false;
 
 	nod--;					// nodurile sunt numărate de la 1, nu de la 0
-	vizitat[nod] = 1;
+	vizitat[nod] = true;
 	qi.push(nod);				// Q <= nod
-	printf("%d;", nod+1);			// CALL vizitare(nod)
+	printf("   %d\n", nod+1);			// CALL vizitare(nod)
 
 	while (!qi.empty()) {			// Q ≠ ∅
 		k = qi.front();			// Q => k
 		qi.pop();
+		gasit = false;
 		for (i = 0; i < nrvarf; i++) {
-			if (0 != vizitat[i])	// vârful a fost deja vizitat
+			if (vizitat[i])		// vârful a fost deja vizitat
 				continue;
 			if (0 == matrice[k*nrvarf + i])
 				continue;	// nu există o muchie (k;i)
-			vizitat[i] = 1;
+			vizitat[i] = true;
 			qi.push(i);		// Q <= i
-			printf(" %d;", i+1);	// CALL vizitare(i)
+			printf(" → %d", i+1);	// CALL vizitare(i)
+			gasit = true;
+		}
+		if (gasit)
+			putchar('\n');
+	}
+	free(vizitat);
+}
+
+// parcurgere în adâncime (DFS)
+void vizad_gnma(const int *matrice, int nrvarf, int nod)
+{
+	int i, k, adancime;
+	stack<int> si;
+	bool *vizitat;				// un vector care reține doar starea vizitat? T/F
+	bool gasit, primul;
+
+	if (nrvarf <= 0)
+		return;
+	vizitat = (bool *) malloc(sizeof(bool) * nrvarf);
+	if (NULL == vizitat)
+		return;
+	for (i = 0; i < nrvarf; i++)		// inițial toate vârfurile sunt nevizitate
+		vizitat[i] = false;
+
+	nod--;					// nodurile sunt numărate de la 1, nu de la 0
+	vizitat[nod] = true;
+	si.push(nod);				// S <= nod
+	printf("   %d", nod+1);			// CALL vizitare(nod)
+	adancime = 2;				// primul în ierarhie
+
+	gasit = false;				// dacă vârful curent mai are vecini nevizitați
+	primul = false;				// ramură nouă?
+	while (!si.empty()) {			// S ≠ ∅
+		if (!gasit) {
+			k = si.top();		// S => k
+			si.pop();
+			adancime--;
+			if (adancime > 1)
+				primul = true;
+		}
+		gasit = false;
+		for (i = 0; i < nrvarf; i++) {
+			if (vizitat[i])		// vârful a fost deja vizitat
+				continue;
+			if (0 == matrice[k*nrvarf + i])
+				continue;	// nu există o muchie (k;i)
+			vizitat[i] = true;
+			si.push(k);		// S <= k
+			if (primul) {
+				printf("\n%*c", 4*adancime, ' ');
+				primul = false;
+			}
+			printf(" → %d", i+1);	// CALL vizitare(i)
+			k = i;
+			adancime++;
+			gasit = true;
+			break;			// am găsit cel puțin un vârf nevizitat adiacent cu k
 		}
 	}
 	putchar('\n');
