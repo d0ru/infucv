@@ -1,11 +1,13 @@
 /*
- * Operații pe lista de muchii a unui graf neorientat.
+ * Operații cu matricea de muchii a unui graf neorientat.
  * Într-o matrice 2x|E| se păstrează lista de muchii.
  *
- * Lista de muchii se dă în felul următor:
+ * Matricea de muchii se dă în felul următor:
+ *   M
  *   u1 u2 ... um
  *   v1 v1 ... vm
- * unde (u1,v1), (u2,v2),.. (um,vm) sunt toate muchiile grafului neorientat.
+ * unde M este numărul total al perechilor de muchii de mai jos, iar
+ * (u1,v1), (u2,v2),.. (um,vm) sunt toate muchiile grafului neorientat.
  */
 
 #include <errno.h>
@@ -13,14 +15,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "gnlm.h"
+#include "gnmm.h"
 
 #include <queue>
 #include <stack>
 using namespace std;
 
 // nrmuchii = |E|, numărul muchiilor grafului neorientat
-int *fcitire_gnlm(FILE *fisier, int *nrmuchii)
+int *fcitire_gnmm(FILE *fisier, int *nrmuchii)
 {
 	int i, m;
 	int *matrice, *pi;
@@ -40,7 +42,7 @@ int *fcitire_gnlm(FILE *fisier, int *nrmuchii)
 }
 
 // afișare listă de muchii
-void fafisare_gnlm(FILE *fisier, const int *matrice, int nrmuchii)
+void fafisare_gnmm(FILE *fisier, const int *matrice, int nrmuchii)
 {
 	int i;
 
@@ -53,7 +55,7 @@ void fafisare_gnlm(FILE *fisier, const int *matrice, int nrmuchii)
 }
 
 // returnează indexul maxim al tututor vârfurilor
-int nrvarf_gnlm(const int *matrice, int nrmuchii)
+int nrvarf_gnmm(const int *matrice, int nrmuchii)
 {
 	int i, m, max;
 
@@ -65,7 +67,7 @@ int nrvarf_gnlm(const int *matrice, int nrmuchii)
 }
 
 // returnează numărul de vecini ai nodului dat
-int nrvec_gnlm(const int *matrice, int nrmuchii, int nod)
+int nrvec_gnmm(const int *matrice, int nrmuchii, int nod)
 {
 	int i, m, vecini;
 
@@ -77,7 +79,7 @@ int nrvec_gnlm(const int *matrice, int nrmuchii, int nod)
 }
 
 // afișează toți vecinii nodului dat
-void afvec_gnlm(const int *matrice, int nrmuchii, int nod)
+void afvec_gnmm(const int *matrice, int nrmuchii, int nod)
 {
 	int i;
 
@@ -91,7 +93,7 @@ void afvec_gnlm(const int *matrice, int nrmuchii, int nod)
 }
 
 // returnează true dacă nodurile sunt adiacente (formează o muchie)
-bool muchie_gnlm(const int *matrice, int nrmuchii, int nod1, int nod2)
+bool muchie_gnmm(const int *matrice, int nrmuchii, int nod1, int nod2)
 {
 	int i;
 
@@ -108,14 +110,14 @@ bool muchie_gnlm(const int *matrice, int nrmuchii, int nod1, int nod2)
 }
 
 // parcurgere în lățime (BFS)
-void vizlat_gnlm(const int *matrice, int nrmuchii, int nod)
+void vizlat_gnmm(const int *matrice, int nrmuchii, int nod)
 {
 	int i, k, l, nrvarf;
 	queue<int> qi;
 	bool *vizitat;				// un vector care reține doar starea vizitat? T/F
 	bool gasit;
 
-	nrvarf = nrvarf_gnlm(matrice, nrmuchii);
+	nrvarf = nrvarf_gnmm(matrice, nrmuchii);
 	vizitat = (bool *) malloc(sizeof(bool) * nrvarf);
 	if (NULL == vizitat)
 		return;
@@ -152,14 +154,14 @@ void vizlat_gnlm(const int *matrice, int nrmuchii, int nod)
 }
 
 // parcurgere în adâncime (DFS)
-void vizad_gnlm(const int *matrice, int nrmuchii, int nod)
+void vizad_gnmm(const int *matrice, int nrmuchii, int nod)
 {
 	int i, k, l, nrvarf, adancime;
 	stack<int> si;
 	bool *vizitat;				// un vector care reține doar starea vizitat? T/F
 	bool gasit, primul;
 
-	nrvarf = nrvarf_gnlm(matrice, nrmuchii);
+	nrvarf = nrvarf_gnmm(matrice, nrmuchii);
 	vizitat = (bool *) malloc(sizeof(bool) * nrvarf);
 	if (NULL == vizitat)
 		return;
