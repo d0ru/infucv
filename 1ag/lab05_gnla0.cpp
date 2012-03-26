@@ -1,5 +1,5 @@
 /*
- * Operații pe lista de adiacență a unui graf neorientat.
+ * Operații cu lista de adiacență a unui graf neorientat.
  *
  * Programul se compilează și se apelează astfel:
  * $ ./lab05_gnla0 < gnla3_13.txt
@@ -13,9 +13,11 @@
 
 #include <errno.h>
 #include <stdbool.h>
-#include <stdio.h>
 #include <stdlib.h>
+#include <stdio.h>
 
+#include "gn.h"
+#include "gn.c"
 #include "gnla.h"
 #include "gnla.cpp"
 
