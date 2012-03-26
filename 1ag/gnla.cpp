@@ -10,9 +10,10 @@
 
 #include <errno.h>
 #include <stdbool.h>
-#include <stdio.h>
 #include <stdlib.h>
+#include <stdio.h>
 
+#include "gn.h"
 #include "gnla.h"
 
 #include <queue>
@@ -74,24 +75,25 @@ struct nod *fcitire_gnla(FILE *fisier, int *nrvarf)
 	return varf;
 }
 
-// afișare la STDOUT
-void afisare_gnla(const struct nod varf[], int nrvarf)
+// afișare listă de adiacență
+void fafisare_gnla(FILE *fisier, const struct nod varf[], int nrvarf)
 {
-	int v;
+	int i;
 	struct nod *pn;
 
-	for (v = 0; v < nrvarf; v++) {
-		printf("%d:", varf[v].nr);
-		pn = varf[v].urm;
+	for (i = 0; i < nrvarf; i++) {
+		fprintf(fisier, "%d:", varf[i].nr);
+		pn = varf[i].urm;
 		while (NULL != pn) {
-			printf(" %d", pn->nr);
+			fprintf(fisier, " %d", pn->nr);
 			pn = pn->urm;
 		}
-		putchar('\n');
+		fputc('\n', fisier);
 	}
 }
 
 // returnează numărul de vecini ai nodului dat
+// (1 ≤ nod ≤ nrvarf)
 int nrvec_gnla(const struct nod varf[], int nrvarf, int nod)
 {
 	int vecini;
@@ -109,6 +111,7 @@ int nrvec_gnla(const struct nod varf[], int nrvarf, int nod)
 }
 
 // afișează toți vecinii nodului dat
+// (1 ≤ nod ≤ nrvarf)
 void afvec_gnla(const struct nod varf[], int nrvarf, int nod)
 {
 	struct nod *pn;
@@ -123,6 +126,7 @@ void afvec_gnla(const struct nod varf[], int nrvarf, int nod)
 }
 
 // returnează true dacă nodurile sunt adiacente (formează o muchie)
+// (1 ≤ nod1 < nod2 ≤ nrvarf)
 bool muchie_gnla(const struct nod varf[], int nrvarf, int nod1, int nod2)
 {
 	struct nod *pn;
@@ -137,27 +141,22 @@ bool muchie_gnla(const struct nod varf[], int nrvarf, int nod1, int nod2)
 	return false;
 }
 
-// parcurgere în lățime (BFS)
-void vizlat_gnla(const struct nod varf[], int nrvarf, int nod)
+
+// afisare componenta conexă de la «nod» cu parcurgere în lățime
+// (1 ≤ nod ≤ nrvarf)
+void afcclatviz_gnla(const struct nod varf[], int nrvarf, int nod, bool *vizitat)
 {
 	int i, k;
 	queue<int> qi;
-	bool *vizitat;				// un vector care reține doar starea vizitat? T/F
 	bool gasit;
 	struct nod *pn;
 
-	if (nrvarf <= 0)
-		return;
-	vizitat = (bool *) malloc(sizeof(bool) * nrvarf);
-	if (NULL == vizitat)
-		return;
-	for (i = 0; i < nrvarf; i++)		// inițial toate vârfurile sunt nevizitate
-		vizitat[i] = false;
-
 	nod--;					// nodurile sunt numărate de la 1, nu de la 0
+	if (vizitat[nod])			// nu ar trebui să fie apelat
+		return;
 	vizitat[nod] = true;
 	qi.push(nod);				// Q <= nod
-	printf("   %d\n", nod+1);		// CALL vizitare(nod)
+	printf("   %d", nod+1);			// CALL vizitare(nod)
 
 	while (!qi.empty()) {			// Q ≠ ∅
 		k = qi.front();			// Q => k
@@ -179,32 +178,62 @@ void vizlat_gnla(const struct nod varf[], int nrvarf, int nod)
 		if (gasit)
 			putchar('\n');
 	}
+}
+
+// afișare componente conexe folosind parcurgerea în lățime
+void afcclat_gnla(const struct nod varf[], int nrvarf)
+{
+	int cc, nod;
+	bool *vizitat;
+
+	vizitat = mkviz(nrvarf);
+	if (NULL == vizitat)
+		return;
+
+	printf("Afișare componente conexe GNLA folosind parcurgerea în lățime!\n");
+	cc = 1;
+	for (nod = 0; nod < nrvarf;) {
+		if (vizitat[nod++])
+			continue;
+		printf("Componenta conexă «%d» începe cu nodul %d:\n", cc++, nod);
+		afcclatviz_gnla(varf, nrvarf, nod, vizitat);
+	}
 	free(vizitat);
 }
 
-// parcurgere în adâncime (DFS)
-void vizad_gnla(const struct nod varf[], int nrvarf, int nod)
+// parcurgere/vizitare în lățime (BFS)
+// (1 ≤ nod ≤ nrvarf)
+void vizlat_gnla(const struct nod varf[], int nrvarf, int nod)
+{
+	bool *vizitat;
+
+	vizitat = mkviz(nrvarf);
+	if (NULL == vizitat)
+		return;
+
+	afcclatviz_gnla(varf, nrvarf, nod, vizitat);
+	free(vizitat);
+}
+
+
+// afisare componenta conexă de la «nod» cu parcurgere în adâncime
+// (1 ≤ nod ≤ nrvarf)
+void afccadviz_gnla(const struct nod varf[], int nrvarf, int nod, bool *vizitat)
 {
 	int i, k, adancime;
 	stack<int> si;
-	bool *vizitat;				// un vector care reține doar starea vizitat? T/F
-	bool gasit, primul;
+	bool cap, gasit, primul;
 	struct nod *pn;
 
-	if (nrvarf <= 0)
-		return;
-	vizitat = (bool *) malloc(sizeof(bool) * nrvarf);
-	if (NULL == vizitat)
-		return;
-	for (i = 0; i < nrvarf; i++)		// inițial toate vârfurile sunt nevizitate
-		vizitat[i] = false;
-
 	nod--;					// nodurile sunt numărate de la 1, nu de la 0
+	if (vizitat[nod])			// nu ar trebui să fie apelat
+		return;
 	vizitat[nod] = true;
 	si.push(nod);				// S <= nod
 	printf("   %d", nod+1);			// CALL vizitare(nod)
 	adancime = 2;				// primul în ierarhie
 
+	cap = true;				// s-a afișat capul componentei conexe
 	gasit = false;				// dacă vârful curent mai are vecini nevizitați
 	primul = false;				// ramură nouă?
 	while (!si.empty()) {			// S ≠ ∅
@@ -212,8 +241,7 @@ void vizad_gnla(const struct nod varf[], int nrvarf, int nod)
 			k = si.top();		// S => k
 			si.pop();
 			adancime--;
-			if (adancime > 1)
-				primul = true;
+			primul = true;
 		}
 		gasit = false;
 		pn = varf[k].urm;		// parcurg lista de vecini ai lui «k»
@@ -225,17 +253,52 @@ void vizad_gnla(const struct nod varf[], int nrvarf, int nod)
 			}
 			vizitat[i] = true;
 			si.push(k);			// S <= k
-			if (primul) {
+			if (primul && !cap)
 				printf("\n%*c", 4*adancime, ' ');
-				primul = false;
-			}
+			else
+				cap = false;		// la următoarele se afișează linie nouă cu indentare
 			printf(" → %d", pn->nr);	// CALL vizitare(i)
 			k = i;
 			adancime++;
+			primul = false;
 			gasit = true;
 			break;			// am găsit cel puțin un vârf nevizitat adiacent cu k
 		}
 	}
 	putchar('\n');
+}
+
+// afișare componente conexe folosind parcurgerea în adâncime
+void afccad_gnla(const struct nod varf[], int nrvarf)
+{
+	int cc, nod;
+	bool *vizitat;
+
+	vizitat = mkviz(nrvarf);
+	if (NULL == vizitat)
+		return;
+
+	printf("Afișare componente conexe GNLA folosind parcurgerea în adâncime!\n");
+	cc = 1;
+	for (nod = 0; nod < nrvarf;) {
+		if (vizitat[nod++])
+			continue;
+		printf("Componenta conexă «%d» începe cu nodul %d:\n", cc++, nod);
+		afccadviz_gnla(varf, nrvarf, nod, vizitat);
+	}
+	free(vizitat);
+}
+
+// parcurgere/vizitare în adâncime (DFS)
+// (1 ≤ nod ≤ nrvarf)
+void vizad_gnla(const struct nod varf[], int nrvarf, int nod)
+{
+	bool *vizitat;
+
+	vizitat = mkviz(nrvarf);
+	if (NULL == vizitat)
+		return;
+
+	afccadviz_gnla(varf, nrvarf, nod, vizitat);
 	free(vizitat);
 }
