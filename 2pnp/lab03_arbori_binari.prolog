@@ -51,3 +51,31 @@ inserare(arb(R,ArbS,ArbD), R, arb(R,ArbS,ArbD)).
 inserare(arb(R,ArbS,ArbD), X, arb(R,ArbS1,ArbD))	:- X < R, inserare(ArbS, X, ArbS1).
 inserare(arb(R,ArbS,ArbD), X, arb(R,ArbS,ArbD1))	:- X > R, inserare(ArbD, X, ArbD1).
 
+
+% creați o listă ordonată din elementele unui arbore binar de căutare
+
+lordonată(n, []).
+lordonată(arb(R,n,n), [R]).
+lordonată(arb(R,ArbS,ArbD), L)	:- lordonată(ArbS,LS), append(LS,[R],L1), lordonată(ArbD,LD), append(L1,LD,L).
+
+
+% să se creeze un arbore binar de căutare cu elementele unei liste de numere
+
+mkarbb(L, ArbBRez)	:- mkarbb(L, n, ArbBRez).
+mkarbb([], ArbBRez, ArbBRez).
+mkarbb([X|Rest], A1, ARez)	:- inserare(A1,X,A2), mkarbb(Rest, A2, ARez).
+
+
+% calculează numărul de elemente dintr-un arbore binar de căutare
+
+nrelem(n, 0).
+nrelem(arb(_R,ArbS,ArbD), N)	:- nrelem(ArbS, N1), nrelem(ArbD, N2), N is N1 + N2 + 1.
+
+
+% Pentru un arbore binar de cautare dat, sa se compare lungimile (numarul de elemente) celor doi subarbori atasati radacinii.
+
+cmpsubarb(n) 	:- writeln('Arborul binar vid.').
+cmpsubarb(arb(_R,ArbS,ArbD))	:- nrelem(ArbS,S), nrelem(ArbD,D), S == D, writeln('Arborele binar este echilibrat.').
+cmpsubarb(arb(_R,ArbS,ArbD))	:- nrelem(ArbS,S), nrelem(ArbD,D), S > D, writeln('Arborele binar are mai multe elemente în ramura stângă.').
+cmpsubarb(arb(_R,ArbS,ArbD))	:- writeln('Arborele binar are mai multe elemente în ramura dreaptă.').
+
