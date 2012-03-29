@@ -4,7 +4,6 @@ Data început: 26.03.2012
 Data sfârșit: 11:59 01.04.2012
 
 
--------------------------
 ## Problema 1: Inversiuni
 
 Fie `x1, x2,.. xn` o secvență de «n» numere întregi distincte.
@@ -35,7 +34,6 @@ fișierul de intrare, scrie în fișierul de ieșire numărul de inversiuni
 din secvență. Fiecare rezultat va fi scris pe o linie separată.
 
 
---------------------
 ## Problema 2: Cutii
 
 Se consideră cutii n-dimensionale date de cele «n» dimensiuni numere
