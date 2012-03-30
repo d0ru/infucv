@@ -7,7 +7,7 @@ Data sfârșit: 11:59 01.04.2012
 ## Problema 1: Inversiuni
 
 Fie `x1, x2,.. xn` o secvență de «n» numere întregi distincte.
-Perechea `(i,j)` se numește inversiune dacă `xi > xj` cu `0 ≤ i < j < n`.
+Perechea `(i,j)` se numește inversiune dacă `xi > xj` cu `1 ≤ i < j ≤ n`.
 
 Exemplu: secvența "2 4 3 1 5 6 9" are 4 inversiuni.
 
@@ -42,6 +42,7 @@ tri-dimensională, în timp ce (6, 2, 4, 1, 5) reprezintă o cutie
 cinci-dimensională.  
 Spunem că o cutie `x = (x1,x2,..xn)` încape în cutia `y = (y1,y2,..yn)`
 dacă există o permutare a dimensiunilor cutiei x astfel încât:
+
     x[i] < y[i], ∀i = 1,n
 
 Exemplu 1: cutia (7, 4) încape în cutia (5, 9) deoarece poate fi
