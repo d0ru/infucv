@@ -36,6 +36,7 @@ int main(int argc, char *argv[])
 		fisier = fopen(argv[1], "r");
 		if (NULL == fisier) {
 			fprintf(stderr, "E: fișierul «%s» nu a putut fi deschis\n", argv[1]);
+			return errno;
 		}
 		liad = fcitire_gnla(fisier, &nr);
 	}
