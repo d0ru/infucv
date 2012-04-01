@@ -16,6 +16,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "gn.h"
+#include "gn.c"
 #include "gnmm.h"
 #include "gnmm.cpp"
 
