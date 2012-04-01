@@ -3,8 +3,6 @@
  * Funcții utilizate des în operațiile cu grafuri.
  */
 
-#include <stdbool.h>
-
 #ifndef INFUCV_GN
 #define INFUCV_GN
 // GN - graf neorientat

@@ -8,18 +8,21 @@
 
 #include "gn.h"
 
-// alocă un vector de vizitare și inițializează cu "false"
+// COMPLEXITATE Θ(n)
 bool *mkviz(int nrvarf)
 {
 	int i;
-	bool *viz;				// un vector care reține doar starea vizitat? T/F
+	bool *viz;				// vizitat? A/F
 
 	if (nrvarf <= 0)
 		return NULL;
+
 	viz = (bool *) malloc(sizeof(bool) * nrvarf);
 	if (NULL == viz)
 		return NULL;
-	for (i = 0; i < nrvarf; i++)		// inițial toate vârfurile sunt nevizitate
+
+	// inițial toate vârfurile sunt nevizitate
+	for (i = 0; i < nrvarf; i++)
 		viz[i] = false;
 	return viz;
 }
