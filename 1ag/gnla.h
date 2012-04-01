@@ -18,48 +18,45 @@ struct nod {
 };
 
 // nrvarf = |V|, numărul vârfurilor grafului neorientat
+// (1 ≤ nod ≤ nrvarf)
+
+// citire listă de adiacență
 struct nod *fcitire_gnla(FILE *fisier, int *nrvarf);
 // citire de la STDIN
-#define citire_gnla(N)	fcitire_gnla(stdin, N)
+#define citire_gnla(N)		fcitire_gnla(stdin, N)
 
 // afișare listă de adiacență
-void fafisare_gnla(FILE *fisier, const struct nod varf[], int nrvarf);
+void fafisare_gnla(FILE *fisier, const struct nod graf[], int nrvarf);
 // afișare la STDOUT
-#define afisare_gnla(V,N)	fafisare_gnla(stdout, V, N)
+#define afisare_gnla(G,N)	fafisare_gnla(stdout, G, N)
 
 // returnează numărul de vecini ai nodului dat
-// (1 ≤ nod ≤ nrvarf)
-int nrvec_gnla(const struct nod varf[], int nrvarf, int nod);
+int nrvec_gnla(const struct nod graf[], int nrvarf, int nod);
 
-// afișează toți vecinii nodului dat
-// (1 ≤ nod ≤ nrvarf)
-void afvec_gnla(const struct nod varf[], int nrvarf, int nod);
+// afișează toți vecinii ai nodului dat
+void afvec_gnla(const struct nod graf[], int nrvarf, int nod);
 
-// returnează true dacă nodurile sunt adiacente (formează o muchie)
+// returnează «true» dacă nodurile sunt adiacente (formează o muchie)
 // (1 ≤ nod1 < nod2 ≤ nrvarf)
-bool muchie_gnla(const struct nod varf[], int nrvarf, int nod1, int nod2);
+bool muchie_gnla(const struct nod graf[], int nrvarf, int nod1, int nod2);
 
 
 // afisare componenta conexă de la «nod» cu parcurgere în lățime
-// (1 ≤ nod ≤ nrvarf)
-void afcclatviz_gnla(const struct nod varf[], int nrvarf, int nod, bool *vizitat);
+void afcclatviz_gnla(const struct nod graf[], int nrvarf, int nod, bool *vizitat);
 
 // afișare componente conexe folosind parcurgerea în lățime
-void afcclat_gnla(const struct nod varf[], int nrvarf);
+void afcclat_gnla(const struct nod graf[], int nrvarf);
 
 // parcurgere/vizitare în lățime (BFS)
-// (1 ≤ nod ≤ nrvarf)
-void vizlat_gnla(const struct nod varf[], int nrvarf, int nod);
+void vizlat_gnla(const struct nod graf[], int nrvarf, int nod);
 
 
 // afisare componenta conexă de la «nod» cu parcurgere în adâncime
-// (1 ≤ nod ≤ nrvarf)
-void afccadviz_gnla(const struct nod varf[], int nrvarf, int nod, bool *vizitat);
+void afccadviz_gnla(const struct nod graf[], int nrvarf, int nod, bool *vizitat);
 
 // afișare componente conexe folosind parcurgerea în adâncime
-void afccad_gnla(const struct nod varf[], int nrvarf);
+void afccad_gnla(const struct nod graf[], int nrvarf);
 
 // parcurgere/vizitare în adâncime (DFS)
-// (1 ≤ nod ≤ nrvarf)
-void vizad_gnla(const struct nod varf[], int nrvarf, int nod);
+void vizad_gnla(const struct nod graf[], int nrvarf, int nod);
 #endif

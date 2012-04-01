@@ -14,33 +14,35 @@
 #define INFUCV_GNMM
 // GNMM - graf neorientat, matrice de muchii
 
+// nrvarf = |V|, numărul nodurilor grafului neorientat
+// (1 ≤ nod ≤ nrvarf)
 // nrmuchii = |E|, numărul muchiilor grafului neorientat
-int *fcitire_gnmm(FILE *fisier, int *nrmuchii);
 
+// citire listă de muchii
+int *fcitire_gnmm(FILE *fisier, int *nrmuchii);
 // citire de la STDIN
-#define citire_gnmm(N)	fcitire_gnmm(stdin, N)
+#define citire_gnmm(M)		fcitire_gnmm(stdin, M)
 
 // afișare listă de muchii
-void fafisare_gnmm(FILE *fisier, const int *matrice, int nrmuchii);
-
+void fafisare_gnmm(FILE *fisier, const int *graf, int nrmuchii);
 // afișare la STDOUT
-#define afisare_gnmm(M,N)	fafisare_gnmm(stdout, M, N)
+#define afisare_gnmm(G,M)	fafisare_gnmm(stdout, G,M)
 
-// returnează indexul maxim al tututor vârfurilor
-int nrvarf_gnmm(const int *matrice, int nrmuchii);
+// returnează numărul vârfurilor
+int nrvarf_gnmm(const int *graf, int nrmuchii);
 
 // returnează numărul de vecini ai nodului dat
-int nrvec_gnmm(const int *matrice, int nrmuchii, int nod);
+int nrvec_gnmm(const int *graf, int nrmuchii, int nod);
 
 // afișează toți vecinii nodului dat
-void afvec_gnmm(const int *matrice, int nrmuchii, int nod);
+void afvec_gnmm(const int *graf, int nrmuchii, int nod);
 
-// returnează true dacă nodurile sunt adiacente (formează o muchie)
-bool muchie_gnmm(const int *matrice, int nrmuchii, int nod1, int nod2);
+// returnează «true» dacă nodurile sunt adiacente (formează o muchie)
+bool muchie_gnmm(const int *graf, int nrmuchii, int nod1, int nod2);
 
 // parcurgere în lățime (BFS)
-void vizlat_gnmm(const int *matrice, int nrmuchii, int nod);
+void vizlat_gnmm(const int *graf, int nrmuchii, int nod);
 
 // parcurgere în adâncime (DFS)
-void vizad_gnmm(const int *matrice, int nrmuchii, int nod);
+void vizad_gnmm(const int *graf, int nrmuchii, int nod);
 #endif

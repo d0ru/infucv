@@ -12,117 +12,127 @@
 
 #include <errno.h>
 #include <stdbool.h>
-#include <stdio.h>
 #include <stdlib.h>
+#include <stdio.h>
 
+#include "gn.h"
 #include "gnmm.h"
 
 #include <queue>
 #include <stack>
 using namespace std;
 
-// nrmuchii = |E|, numărul muchiilor grafului neorientat
+// n = |V|, numărul nodurilor grafului neorientat
+// m = |E|, numărul muchiilor grafului neorientat
+// c, numărul de componente conexe ale grafului neorientat
+
+// COMPLEXITATE timp Θ(m) | spațiu Θ(m)
 int *fcitire_gnmm(FILE *fisier, int *nrmuchii)
 {
 	int i, m;
-	int *matrice, *pi;
+	int *graf;				// matricea muchiilor (2x|E|)
+	int *elem;
 
-	fscanf(fisier, "%i", nrmuchii);
-	if (*nrmuchii <= 0)
+	if (1 != fscanf(fisier, "%i", nrmuchii))
 		return NULL;
+
+	if (*nrmuchii <= 0) {
+		fprintf(stderr, "E: numărul de muchii «%d» trebuie să fie pozitiv!\n", *nrmuchii);
+		return NULL;
+	}
+
 	m = (*nrmuchii) * 2;
-	matrice = (int *) calloc(m, sizeof(int));	// 2x|E|
-	if (NULL == matrice)
+	graf = (int *) calloc(m, sizeof(int));	// 2x|E|
+	if (NULL == graf)
 		return NULL;
 
-	pi = matrice;
+	elem = graf;
 	for (i = 0; i < m; i++)
-		fscanf(fisier, "%d", pi++);
-	return matrice;
+		fscanf(fisier, "%d", elem++);
+	return graf;
 }
 
-// afișare listă de muchii
-void fafisare_gnmm(FILE *fisier, const int *matrice, int nrmuchii)
+// COMPLEXITATE timp Θ(m) | spațiu Θ(m)
+void fafisare_gnmm(FILE *fisier, const int *graf, int nrmuchii)
 {
 	int i;
 
 	for (i = 0; i < nrmuchii; i++)
-		fprintf(fisier, " %d", matrice[i]);
+		fprintf(fisier, " %d", graf[i]);
 	putchar('\n');
 	for (i = 0; i < nrmuchii; i++)
-		fprintf(fisier, " %d", matrice[nrmuchii + i]);
+		fprintf(fisier, " %d", graf[nrmuchii + i]);
 	putchar('\n');
 }
 
-// returnează indexul maxim al tututor vârfurilor
-int nrvarf_gnmm(const int *matrice, int nrmuchii)
+// COMPLEXITATE Θ(m)
+int nrvarf_gnmm(const int *graf, int nrmuchii)
 {
 	int i, m, max;
 
 	m = nrmuchii * 2;
 	for (i = 0, max = 1; i < m; i++)
-		if (matrice[i] > max)
-			max = matrice[i];
+		if (graf[i] > max)
+			max = graf[i];
 	return max;
 }
 
-// returnează numărul de vecini ai nodului dat
-int nrvec_gnmm(const int *matrice, int nrmuchii, int nod)
+// COMPLEXITATE Θ(m)
+int nrvec_gnmm(const int *graf, int nrmuchii, int nod)
 {
 	int i, m, vecini;
 
 	m = nrmuchii * 2;
 	for (i = 0, vecini = 0; i < m; i++)
-		if (matrice[i] == nod)
+		if (graf[i] == nod)
 			vecini++;
 	return vecini;
 }
 
-// afișează toți vecinii nodului dat
-void afvec_gnmm(const int *matrice, int nrmuchii, int nod)
+// COMPLEXITATE Θ(m)
+void afvec_gnmm(const int *graf, int nrmuchii, int nod)
 {
 	int i;
 
 	for (i = 0; i < nrmuchii; i++) {
-		if (matrice[i] == nod)
-			printf(" %d;", matrice[nrmuchii + i]);
-		if (matrice[nrmuchii + i] == nod)
-			printf(" %d;", matrice[i]);
+		if (graf[i] == nod)
+			printf(" %d;", graf[nrmuchii + i]);
+		else if (graf[nrmuchii + i] == nod)
+			printf(" %d;", graf[i]);
 	}
 	putchar('\n');
 }
 
-// returnează true dacă nodurile sunt adiacente (formează o muchie)
-bool muchie_gnmm(const int *matrice, int nrmuchii, int nod1, int nod2)
+// COMPLEXITATE Θ(m)
+bool muchie_gnmm(const int *graf, int nrmuchii, int nod1, int nod2)
 {
 	int i;
 
 	if (nod1 > nod2) {			// nu sunt ordonate
-		nod1 += nod2;			// nod1 <- nod2
+		nod1 += nod2;
 		nod2 = nod1 - nod2;		// nod2 <- nod1
-		nod1 -= nod2;
+		nod1 -= nod2;			// nod1 <- nod2
 	}
+
 	for (i = 0; i < nrmuchii; i++) {
-		if (matrice[i] == nod1 && matrice[nrmuchii + i] == nod2)
+		if (graf[i] == nod1 && graf[nrmuchii + i] == nod2)
 			return true;
 	}
 	return false;
 }
 
-// parcurgere în lățime (BFS)
-void vizlat_gnmm(const int *matrice, int nrmuchii, int nod)
+// COMPLEXITATE Θ(n+m²)#c
+void vizlat_gnmm(const int *graf, int nrmuchii, int nod)
 {
 	int i, k, l, nrvarf;
 	queue<int> qi;
-	bool *vizitat;				// un vector care reține doar starea vizitat? T/F
+	bool *vizitat;				// vizitat? A/F
 	bool gasit;
 
-	nrvarf = nrvarf_gnmm(matrice, nrmuchii);
-	vizitat = (bool *) malloc(sizeof(bool) * nrvarf);
+	nrvarf = nrvarf_gnmm(graf, nrmuchii);
+	vizitat = mkviz(nrvarf);
 	if (NULL == vizitat)
 		return;
-	for (i = 0; i < nrvarf; i++)		// inițial toate vârfurile sunt nevizitate
-		vizitat[i] = false;
 
 	vizitat[nod-1] = true;
 	qi.push(nod);				// Q <= nod
@@ -134,10 +144,10 @@ void vizlat_gnmm(const int *matrice, int nrmuchii, int nod)
 		gasit = false;
 
 		for (i = 0; i < nrmuchii; i++) {
-			if (matrice[i] == k)
-				l = matrice[nrmuchii + i];
-			else if (matrice[nrmuchii + i] == k)
-				l = matrice[i];
+			if (graf[i] == k)
+				l = graf[nrmuchii + i];
+			else if (graf[nrmuchii + i] == k)
+				l = graf[i];
 			else
 				continue;
 			if (vizitat[l-1])	// vârful a fost deja vizitat
@@ -153,21 +163,18 @@ void vizlat_gnmm(const int *matrice, int nrmuchii, int nod)
 	free(vizitat);
 }
 
-// parcurgere în adâncime (DFS)
-void vizad_gnmm(const int *matrice, int nrmuchii, int nod)
+// COMPLEXITATE Θ(n+m²)#c
+void vizad_gnmm(const int *graf, int nrmuchii, int nod)
 {
 	int i, k, l, nrvarf, adancime;
 	stack<int> si;
-	bool *vizitat;				// un vector care reține doar starea vizitat? T/F
+	bool *vizitat;				// vizitat? A/F
 	bool gasit, primul;
 
-	nrvarf = nrvarf_gnmm(matrice, nrmuchii);
-	vizitat = (bool *) malloc(sizeof(bool) * nrvarf);
+	nrvarf = nrvarf_gnmm(graf, nrmuchii);
+	vizitat = mkviz(nrvarf);
 	if (NULL == vizitat)
 		return;
-	for (i = 0; i < nrvarf; i++)		// inițial toate vârfurile sunt nevizitate
-		vizitat[i] = false;
-
 
 	vizitat[nod-1] = true;
 	si.push(nod);				// S <= nod
@@ -187,10 +194,10 @@ void vizad_gnmm(const int *matrice, int nrmuchii, int nod)
 		gasit = false;
 
 		for (i = 0; i < nrmuchii; i++) {
-			if (matrice[i] == k)
-				l = matrice[nrmuchii + i];
-			else if (matrice[nrmuchii + i] == k)
-				l = matrice[i];
+			if (graf[i] == k)
+				l = graf[nrmuchii + i];
+			else if (graf[nrmuchii + i] == k)
+				l = graf[i];
 			else
 				continue;
 			if (vizitat[l-1])	// vârful a fost deja vizitat
