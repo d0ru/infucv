@@ -65,8 +65,8 @@ int main(void)
 
 	magie = 0;				// de câte ori am folosit magia
 	viata = 100;				// unități de viață la start
-	i = 1;
-	while (i <= n) {
+	i = 0;
+	while (i < n) {
 		// date de intrare incorecte ↦ comportament imprevizibil
 		fscanf(fintrare, "%hu %hu", &b, &p);
 		viata += b;			// adaug bonusul de nivel
@@ -79,17 +79,17 @@ int main(void)
 				viata = 100 - p;	// nimicește monstrul cu sabia
 			}
 #ifndef NDEBUG
-			fprintf(stdout, "I: energie maximă (i=%hu, b=%hu, p=%hu, viata=%hu)\n", i, b, p, viata);
+//			fprintf(stdout, "I: energie maximă (nivelul #%hu, b=%hu, p=%hu, viata=%hu)\n", i, b, p, viata);
 #endif
 		} else if (viata > p) {
 			viata -= p;		// nimicește monstrul cu sabia
 #ifndef NDEBUG
-			fprintf(stdout, "W: pierd energie (i=%hu, b=%hu, p=%hu, viata=%hu)\n", i, b, p, viata);
+//			fprintf(stdout, "W: pierd energie (nivelul #%hu, b=%hu, p=%hu, viata=%hu)\n", i, b, p, viata);
 #endif
 		} else {
 			++magie;		// cuvântul magic
 #ifndef NDEBUG
-			fprintf(stdout, "HOCUS POCUS #%hu (i=%hu, b=%hu, p=%hu, viata=%hu)\n", magie, i, b, p, viata);
+			fprintf(stdout, "HOCUS POCUS #%hu (nivelul #%hu, b=%hu, p=%hu, viata=%hu)\n\n", magie, i, b, p, viata);
 #endif
 		}
 		++i;
