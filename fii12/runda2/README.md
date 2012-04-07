@@ -16,9 +16,9 @@ unități convenționale și se notează prin `p[i]`.
 Se mai cunoaște `b[i]`, un bonus primit la începutul nivelului «i».
 
 În orice moment din joc ai o viață `1 ≤ V ≤ 100` (inițial 100).
-Trebuie să distrugi câte un monstru (în ordinea dată `1,2..n`) aplicând
-contra fiecăruia din ei una din cele două arme pe care le ai la
-dispoziție: sabia sau un cuvînt magic.
+Trebuie să parcurgi fiecare nivel `1, 2.. n` aplicând contra fiecărui
+monstru una din cele două arme pe care le ai la dispoziție: sabia sau
+un cuvânt magic.
 
 Dacă nimicești monstrul «i» cu ajutorul sabiei, pierzi din viata ta
 `p[i]` unități. Dacă însă distrugi monstrul pronunțând cuvântul magic,
@@ -41,14 +41,14 @@ magic să fie pronunțat de un număr minimal de ori.
 ### Date de intrare
 
 Fișierul text `joc.in` conține pe prima linie un singur număr întreg -
-numărul de monștri «n».
+numărul de monștri `n`.
 Următoarele «n» linii ale fișierului de intrare conțin câte două numere
-întregi separate prin spațiu `b[i] p[i]` ce descriu bonusul de nivel și
+întregi separate prin spațiu `bi pi` ce reprezintă bonusul de nivel și
 puterea monstrului «i».
 
     [joc.in]
     4
-    0 20
+    00 20
     30 40
     30 60
     20 80
@@ -111,7 +111,7 @@ tampon se încarcă următorul fragment al filmului video; cum memoria
 tampon este plină, din nou se începe reproducerea fragmentului încărcat
 ș.a.m.d..
 
-5. Programul reproduce ultimul fragment de film chiar și atunci cînd el
+5. Programul reproduce ultimul fragment de film chiar și atunci când el
 conține și mai puțin de «s» octeți.
 
 Evident, pentru o vizionare cât mai plăcută, Păcală ar dori ca numărul
@@ -136,7 +136,7 @@ informație sunt mărimi continue sau, prin alte cuvinte, sunt admise
 ### Date de intrare
 
 Fișierul text `video.in` conține pe prima linie numerele întregi
-`b d t p` separate prin spațiu.
+`d b t p` separate prin spațiu.
 
 
 ### Date de ieșire
@@ -144,6 +144,21 @@ Fișierul text `video.in` conține pe prima linie numerele întregi
 Fișierul text `video.out` va conține pe o singură linie numărul întreg `s`.
 Dacă există mai multe soluții, în fișierul de ieșire se va scrie cea mai
 mică valoare a lui «s».
+
+    Exemplul nr. 1
+    --------------
+    [video.in]                            [video.out]
+    1024 2048 100 20                      20480
+
+    Exemplul nr. 2
+    --------------
+    [video.in]                            [video.out]
+    1024 2048 90 20                       18432
+
+    Exemplul nr. 3
+    --------------
+    [video.in]                            [video.out]
+    1024 1025 1 1                         1
 
 
 ### Restricții și precizări
