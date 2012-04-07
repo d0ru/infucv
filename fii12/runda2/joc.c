@@ -23,8 +23,24 @@
 
 //#define NDEBUG
 
+#include <assert.h>
 #include <errno.h>
+#include <stdbool.h>
 #include <stdio.h>
+#include <stdlib.h>
+
+#define MAXPUTERE	100
+
+short unsigned int n;				// limita superioară 20000
+unsigned char *bonus;
+unsigned char *monstru;
+unsigned char *energie;
+
+// citesc informații de nivel (b+p) și calculez «pmin»
+void citire_nivele(FILE *fisier);
+
+// luptă cu fiecare monstru în ordine cronologică
+int lupta_monstri(void);
 
 /**
  * Soluție
@@ -33,9 +49,19 @@
  * compar unitățile de viață curente cu puterea monstrului. Dacă am
  * mai multă energie decât monstrul folosesc sabia, altfel abracadabra.
  *
+ * divide et impera: toate nivelurile sunt împărțite în mai multe serii
+ * independente, o serie avand unul sau mai multe nivele. Orice serie se
+ * încheie cu un nivel la care nu am suficientă energie pentru a învinge
+ * monstrul cu sabia. Așadar în fiecare serie am voie să aplic magia
+ * *doar* o singură dată.
+ *
+ * Cunoscând primul și ultimul nivel dintr-o serie se calculează cea
+ * mai bună strategie de luptă pentru ca aplicând magia o singură dată
+ * să rămân cu cât mai multă viață la încheierea seriei.
+ *
  * Sunt tratate cazurile excepționale:
- * - am depășit nivelul maxim de energie (100)
- * - monstrul are puterea maximă (100), deci nu pot să-l înving
+ * - am depășit nivelul maxim de unități convenționale (100)
+ * - monstrul are puterea maximă (100), nu pot să-l înving cu sabia
  *
  * Observație: pentru depanare se comentează declarea macroului NDEBUG
  */
@@ -43,8 +69,7 @@ int main(void)
 {
 	FILE *fintrare;				// "r" din «joc.in»
 	FILE *fiesire;				// "w" în «joc.out»
-	short unsigned int i, n, magie;		// limita superioară 20000
-	short unsigned int b, p, viata;		// limita superioară 100
+	int nrmagie;
 
 	fintrare = fopen("joc.in", "r");
 	if (NULL == fintrare) {
@@ -60,40 +85,153 @@ int main(void)
 
 	// citesc numărul de monștri
 	if (1 != fscanf(fintrare, "%hu", &n))
-		return errno;			// eroare de citire sau
-						// sfârșit de fișier
+		return errno;			// eroare de citire
 
-	magie = 0;				// de câte ori am folosit magia
-	viata = 100;				// unități de viață la start
-	i = 0;
-	while (i < n) {
-		// date de intrare incorecte ↦ comportament imprevizibil
-		fscanf(fintrare, "%hu %hu", &b, &p);
-		viata += b;			// adaug bonusul de nivel
-		if (viata > 100) {
-			if (100 == p) {
-				viata = 100;
-				++magie;		// cuvântul magic
+	bonus = (unsigned char *) malloc(sizeof(unsigned char) * n);
+	if (NULL == bonus) {
+		fprintf(stderr, "E: nu s-a putut aloca memorie pentru vectorul bonus[%hu]\n", n);
+		return errno;
+	}
+
+	monstru = (unsigned char *) malloc(sizeof(unsigned char) * n);
+	if (NULL == monstru) {
+		fprintf(stderr, "E: nu s-a putut aloca memorie pentru vectorul monstru[%hu]\n", n);
+		return errno;
+	}
+
+	energie = (unsigned char *) malloc(sizeof(unsigned char) * n);
+	if (NULL == energie) {
+		fprintf(stderr, "E: nu s-a putut aloca memorie pentru vectorul energie[%hu]\n", n);
+		return errno;
+	}
+
+	citire_nivele(fintrare);
+	nrmagie = lupta_monstri();
+	fprintf(fiesire, "%i\n", nrmagie);
+	return 0;
+}
+
+// COMPLEXITATE timp Θ(n) | spațiu Θ(n)
+void citire_nivele(FILE *fisier)
+{
+	int i;
+	short unsigned int b, p;		// limita superioară MAXPUTERE
+	unsigned char *pb;			// element curent bonus[]
+	unsigned char *pm;			// element curent monstru[]
+
+	pb = bonus; pm = monstru;
+	for (i = 0; i < n; ++i, ++pb, ++pm) {
+		// date de intrare incorecte ↦ comportament impredictibil
+		fscanf(fisier, "%hu %hu", &b, &p);
+		*pb = (unsigned char) b;	// conversie la 1 octet
+		*pm = (unsigned char) p;
+
+		// depanare: verific datele de intrare
+		assert(*pb <= MAXPUTERE);
+		assert(*pm <= MAXPUTERE);
+#ifndef NDEBUG
+//		fprintf(stdout, "I: nivelul #%i, b=%u, p=%u\n", i, *pb, *pm);
+#endif
+	}
+}
+
+// COMPLEXITATE O(d²)
+int o_magie(unsigned char *viata, int prim, int ultim)
+{
+	int i, j, nmax;
+	unsigned char vmax;
+
+	nmax = ultim;				// implicit: ultimul nivel
+	for (i = ultim-1; i >= prim; --i) {
+		vmax = energie[i] + bonus[i];	// aplică magia pe monstrul «i»
+		if (vmax > 100)
+			vmax = 100;		// energia maximă posibilă
+
+		// recalculez energia rămasă până la nivelul «ultim»
+		for (j = i+1; j <= ultim; ++j) {
+			vmax += bonus[j];
+			if (vmax > 100)
+				vmax = 100;
+			if (vmax > monstru[j]) {
+				vmax -= monstru[j];	// lupt cu sabia
 			} else {
-				// viața crește doar până la 100 de unități
-				viata = 100 - p;	// nimicește monstrul cu sabia
+				vmax = 0;	// nu pot aplica iar magia
+				break;
 			}
+		}
+
+		// salvez cea mai bună strategie de luptă
+		if (*viata < vmax) {
+			*viata = vmax;
+			nmax = i;
 #ifndef NDEBUG
-//			fprintf(stdout, "I: energie maximă (nivelul #%hu, b=%hu, p=%hu, viata=%hu)\n", i, b, p, viata);
-#endif
-		} else if (viata > p) {
-			viata -= p;		// nimicește monstrul cu sabia
-#ifndef NDEBUG
-//			fprintf(stdout, "W: pierd energie (nivelul #%hu, b=%hu, p=%hu, viata=%hu)\n", i, b, p, viata);
-#endif
-		} else {
-			++magie;		// cuvântul magic
-#ifndef NDEBUG
-			fprintf(stdout, "HOCUS POCUS #%hu (nivelul #%hu, b=%hu, p=%hu, viata=%hu)\n\n", magie, i, b, p, viata);
+			if (monstru[i] < monstru[ultim])
+				fprintf(stdout, "D: @%i BUTURUGA MICĂ #%i RĂSTOARNĂ CARUL MARE %u < %u (vmax = %u)\n", ultim, i, monstru[i], monstru[ultim], vmax);
 #endif
 		}
-		++i;
 	}
-	fprintf(fiesire, "%hu\n", magie);
-	return 0;
+	return nmax;
+}
+
+// COMPLEXITATE O(n+∑d²)
+int lupta_monstri(void)
+{
+	int nmax, prim, ultim;			// delimitatori serie niveluri
+	int nrmagie;				// de câte ori am folosit magia
+	unsigned char viata;			// limită superioară MAXPUTERE
+	unsigned char *pb;			// element curent bonus[]
+	unsigned char *pm;			// element curent monstru[]
+
+	viata = 100;				// unități de viață la start
+	pb = bonus; pm = monstru;
+	for (prim = ultim = 0, nrmagie = 0; ultim < n; ++ultim, ++pb, ++pm) {
+		energie[ultim] = viata;		// energia la începutul nivelului curent
+		viata = (unsigned char)(viata + *pb);
+		if (viata >= 100) {
+			viata = 100;
+			prim = ultim;		// încep o nouă serie de aici
+#ifndef NDEBUG
+			fprintf(stdout, "I: energie maximă (nivelul #%i, e=%u, b=%u, p=%u, viata=%u)\n", ultim, energie[ultim], *pb, *pm, viata);
+#endif
+		}
+
+		if (100 == *pm) {
+			++nrmagie;		// doar magia ne poate ajuta
+			prim = ultim + 1;	// încep seria de la următorul nivel
+#ifndef NDEBUG
+			fprintf(stdout, "ABRACADABRA #%hu (nivelul #%i, e=%u, b=%u ⌊%u⌉, viata=%u)\n", nrmagie, ultim, energie[ultim], *pb, *pm, viata);
+#endif
+			continue;
+		}
+
+		if (viata > *pm) {
+			// nimicește monstrul cu sabia
+			viata = (unsigned char)(viata - *pm);
+#ifndef NDEBUG
+			fprintf(stdout, "D: pierd energie (nivelul #%i, e=%u, b=%u, p=%u, viata=%u)\n", ultim, energie[ultim], *pb, *pm, viata);
+#endif
+		} else {
+			// doar magia ne poate ajuta
+			if ((viata < 100 - *pm) && (prim < ultim)) {
+#ifndef NDEBUG
+				fprintf(stdout, "W: monstru prea puternic (nivelul #%i, e=%u, b=%u ⌊%u⌉ viata=%u)\n", ultim, energie[ultim], *pb, *pm, viata);
+				fprintf(stdout, "I: caut uriasul din seria [%i..%i]\n", prim, ultim);
+#endif
+				// folosesc o singură dată magia cât mai eficient
+				nmax = o_magie(&viata, prim, ultim);
+#ifndef NDEBUG
+			} else {
+				fprintf(stdout, "I: *NU* caut altă strategie mai eficientă (%u ≥ 100 - %u)\n", viata, *pm);
+				nmax = ultim;
+#endif
+			}
+
+			++nrmagie;
+			prim = ultim + 1;	// încep seria de la următorul nivel
+#ifndef NDEBUG
+			fprintf(stdout, "HOCUS POCUS #%i (nivelul #%i, e=%u, b=%u ⌊%u⌉ viat@=%u)\n\n", nrmagie, nmax, energie[nmax], bonus[nmax], monstru[nmax], viata);
+#endif
+		}
+	}
+	return nrmagie;
 }
