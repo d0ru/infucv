@@ -230,7 +230,7 @@ void crsecv_cutii(struct cutii *multime, short int **secv,
 		}
 
 		// compar cutia «i» cu ultima cutie «k»
-		if ((u != i) && !cutie_inclusa(multime, u, i)) {
+		if ((0 != *k) && (u != i) && !cutie_inclusa(multime, u, i)) {
 #ifndef NDEBUG
 			cu = (int)((multime->ord[u] - multime->dim[0])/MAXN + 1);
 			fprintf(stdout, "I: - cutia %i nu este inclusă în cutia %i\n", cu, ci);
