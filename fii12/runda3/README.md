@@ -9,10 +9,55 @@
     In: strung.in | Out: strung.out
     Timp: 1s | Memorie: 64 MB (din care 32 MB stivă)
 
+Se consideră «m» strunguri identice destinate prelucrării automate a
+unor piese. Strungurile funcționează independent unul de altul.
+În procesul prelucrării piesele sunt avansate către strunguri cu
+ajutorul unei benzi rulante.
+
+Piesele de prelucrat sunt numerotate în ordinea apariției lor pe bandă
+prin numerele naturale `1 2 3…n`.
+Pentru fiecare piesă «i» se cunoaște timpul `d[i]` necesar pentru
+prelucrarea ei pe unul din cele «m» strunguri.
+
 ### Cerință
 
-Elaborați un program care calculează timpul necesar pentru a prelucra
-toate piesele.
+Elaborați un program care calculează timpul `Q` necesar pentru a
+prelucra toate piesele.
+
+### Date de intrare
+
+Fișierul text `strung.in` conține pe prima linie două numere naturale
+`m n`, separate prin spațiu. Fiecare din următoarele «n» linii ale
+fișierului de intrare conține câte un număr natural.
+Linia «i+1» a fișierului de intrare conține numărul natural `d[i]` —
+timpul necesar pentru prelucrarea piesei «i» pe unul din cele «m»
+strunguri.
+
+### Date de ieșire
+
+Fișierul text `strung.out` va conține pe o singură linie numărul natural
+`Q` — timpul necesar pentru a prelucra toate piesele.
+
+    Exemplu
+    -------
+    [strung.in]     [strung.out]
+    3 10            16
+    1
+    2
+    3
+    9
+    7
+    5
+    2
+    3
+    4
+    6
+
+### Restricții și precizări
+
+* ` 2 ≤ m ≤ 100`
+* ` 1 ≤ n ≤ 1000`
+* ` 1 ≤ d[i] ≤ 30`, i=1…n
 
 
 ## Problema 2: Insule
@@ -45,7 +90,7 @@ De exemplu, pe următoarea tablă există 7 pătrățele sigure.
     -----------------
     |   |   | × | × |
     -----------------
-    |   | × | × | × |
+    |   | × |   | × |
     -----------------
 
 Considerăm că o damă poate ataca orice poziție în una din direcțiile
