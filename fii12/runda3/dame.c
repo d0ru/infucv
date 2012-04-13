@@ -91,24 +91,24 @@ int main(void)
 		nrps -= puncte_dama(damax[i], damay[i]);
 	// depanare: numărul de pătrățele nu poate fi negativ
 	assert(nrps > 0);
-	fprintf(fiesire, "%i", nrps);
+	fprintf(fiesire, "%d", nrps);
 #ifndef NDEBUG
 	afisare_tabla(stdout);
 #endif
 	return 0;
 }
 
-// COMPLEXITATE timp Θ(n⋅m + nd + np) | spațiu Θ(n⋅m + nd)
+// COMPLEXITATE timp θ(n•m + nd + np) | spațiu θ(n•m + nd)
 int citire_tabla(FILE *fisier, char *nd, char *np)
 {
 	int i, j;
 	short int x, y;
 
 	// citesc numărul de linii și coloane
-	if (2 != fscanf(fisier, "%hi %hi", &n, &m))
+	if (2 != fscanf(fisier, "%hd %hd", &n, &m))
 		return errno;			// eroare de citire
 #ifndef NDEBUG
-	printf("n=%hi, m=%hi\n", n, m);
+	printf("n=%hd, m=%hd\n", n, m);
 #endif
 
 	for (i = 0; i <= n; ++i)
@@ -118,12 +118,12 @@ int citire_tabla(FILE *fisier, char *nd, char *np)
 		}
 
 	// citesc numărul de dame
-	if (1 != fscanf(fisier, "%i", &i))
+	if (1 != fscanf(fisier, "%d", &i))
 		return errno;			// eroare de citire
 	*nd = (char) i;
 	for (i = 1; i <= *nd; ++i) {
 		// citesc și salvez pozițiile damelor pe tabla de șah
-		fscanf(fisier, "%hi %hi", &x, &y);
+		fscanf(fisier, "%hd %hd", &x, &y);
 		damax[i] = x;			// linia
 		damay[i] = y;			// coloana
 		// marchez pozițiile damelor
@@ -132,12 +132,12 @@ int citire_tabla(FILE *fisier, char *nd, char *np)
 	}
 
 	// citesc numărul de pioni
-	if (1 != fscanf(fisier, "%i", &i))
+	if (1 != fscanf(fisier, "%d", &i))
 		return errno;			// eroare de citire
 	*np = (char) i;
 	for (i = 1; i <= *np; ++i) {
 		// citesc pozițiile pionilor pe tabla de șah
-		fscanf(fisier, "%hi %hi", &x, &y);
+		fscanf(fisier, "%hd %hd", &x, &y);
 		// marchez pozițiile pionilor
 		piesa[x][y] = true;
 		vizitat[x][y] = true;
@@ -146,14 +146,14 @@ int citire_tabla(FILE *fisier, char *nd, char *np)
 }
 
 #ifndef NDEBUG
-// COMPLEXITATE timp Θ(n⋅m + nd + np) | spațiu Θ(n⋅m + nd)
+// COMPLEXITATE timp θ(n•m + nd + np) | spațiu θ(n•m + nd)
 void afisare_tabla(FILE *fisier)
 {
 	int i, j;
 
 	fprintf(fisier, "%4c", ' ');
 	for (j = 1; j <= m; ++j)
-		fprintf(fisier, "%3i", j);
+		fprintf(fisier, "%3d", j);
 	fputc('\n', fisier);
 
 	fprintf(fisier, "%3c", ' ');
@@ -162,7 +162,7 @@ void afisare_tabla(FILE *fisier)
 	fputc('\n', fisier);
 
 	for (i = 1; i <= n; ++i) {
-		fprintf(fisier, "%3i|", i);
+		fprintf(fisier, "%3d|", i);
 		for (j = 1; j <= m; ++j)
 			if (piesa[i][j])	// avem o piesă
 				fprintf(fisier, "  P");
@@ -180,7 +180,7 @@ void afisare_tabla(FILE *fisier)
 }
 #endif
 
-// COMPLEXITATE Θ(n+m)
+// COMPLEXITATE θ(n+m)
 int puncte_dama(short int x, short int y)
 {
 	int i, j;
@@ -198,7 +198,7 @@ int puncte_dama(short int x, short int y)
 		++nrpuncte;
 	}
 #ifndef NDEBUG
-	printf("dama[%hi][%hi] → d1:%i", x, y, nrpuncte);
+	printf("dama[%hd][%hd] → d1:%d", x, y, nrpuncte);
 #endif
 
 	// direcția 2: pe verticală în sus
@@ -212,7 +212,7 @@ int puncte_dama(short int x, short int y)
 		++nrpuncte;
 	}
 #ifndef NDEBUG
-	printf(" d2:%i", nrpuncte);
+	printf(" d2:%d", nrpuncte);
 #endif
 
 	// direcția 3: pe orizontală la stânga
@@ -226,7 +226,7 @@ int puncte_dama(short int x, short int y)
 		++nrpuncte;
 	}
 #ifndef NDEBUG
-	printf(" d3:%i", nrpuncte);
+	printf(" d3:%d", nrpuncte);
 #endif
 
 	// direcția 4: pe orizontală la dreapta
@@ -240,7 +240,7 @@ int puncte_dama(short int x, short int y)
 		++nrpuncte;
 	}
 #ifndef NDEBUG
-	printf(" d4:%i", nrpuncte);
+	printf(" d4:%d", nrpuncte);
 #endif
 
 	// direcția 5: pe diagonală la stânga jos
@@ -254,7 +254,7 @@ int puncte_dama(short int x, short int y)
 		++nrpuncte;
 	}
 #ifndef NDEBUG
-	printf(" d5:%i", nrpuncte);
+	printf(" d5:%d", nrpuncte);
 #endif
 
 	// direcția 6: pe diagonală la stânga sus
@@ -268,7 +268,7 @@ int puncte_dama(short int x, short int y)
 		++nrpuncte;
 	}
 #ifndef NDEBUG
-	printf(" d6:%i", nrpuncte);
+	printf(" d6:%d", nrpuncte);
 #endif
 
 	// direcția 7: pe diagonală la dreapta jos
@@ -282,7 +282,7 @@ int puncte_dama(short int x, short int y)
 		++nrpuncte;
 	}
 #ifndef NDEBUG
-	printf(" d7:%i", nrpuncte);
+	printf(" d7:%d", nrpuncte);
 #endif
 
 	// direcția 8: pe diagonală la dreapta sus
@@ -296,7 +296,7 @@ int puncte_dama(short int x, short int y)
 		++nrpuncte;
 	}
 #ifndef NDEBUG
-	printf(" d8:%i\n", nrpuncte);
+	printf(" d8:%d\n", nrpuncte);
 #endif
 	return nrpuncte;
 }
