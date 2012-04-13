@@ -54,8 +54,8 @@ void msort(int prim, int ultim);
  * La fiecare pas vectorul strungurilor este sortat crescător. Așadar,
  * primul strung are cea mai mică lungime → se adaugă piesa următoare.
  * Se ordonează primul strung în vector (a crescut lungimea pieselor)
- * folosind o variantă liniară a algoritmul de sortare “insertion”
- * peste un vector parțial ordonat (mai puțin primul element) — θ(m).
+ * folosind o variantă liniară a algoritmul de sortare “merge” peste
+ * un vector parțial ordonat (mai puțin primul element) — θ(lg(m)).
  *
  * Procesul se termină când au fost repartizate toate piesele pe câte
  * un strung. Timpul minim necesar pentru prelucrarea tuturor pieselor
@@ -68,21 +68,22 @@ void msort(int prim, int ultim);
  * pentru cele «m» strunguri. Astfel, inițial avem vectorul:
  *   1 2 … m m+1 m+2 … … … n
  *   X X...X  X   X  . . . X (subșirul de «m» elemente este sortat)
- *   ↑     ↑
+ *   ↑     ↑ urm
  *   prim  ultim
  * La prima iterație strung[1] este adăugat la piesa[m+1], prim și
  * ultim sunt incrementate, ultima valoare este sortată în subșir.
- *   1 2 … m m+1 m+2 … … … n
- *   X X...X  X   X  . . . X (subșirul de «m» elemente este sortat)
- *     ↑      ↑
+ *   - 2 … m m+1 m+2 … … … n
+ *   - X...X  X   X  . . . X (subșirul de «m» elemente este sortat)
+ *     ↑      ↑  urm
  *     prim   ultim
- * Rezultatul căutat este valoarea finală de pe poziția «n».
+ * Rezultatul căutat este lungimea maximă de pe poziția «n».
  */
 int main(void)
 {
 	FILE *fintrare;				// "r" din «strung.in»
 	FILE *fiesire;				// "w" în «strung.out»
-	int i, cheia, prim, ultim, urm;
+	short int cheia;
+	int i, prim, ultim, urm;
 #ifndef NDEBUG
 	int j;
 #endif
@@ -99,37 +100,37 @@ int main(void)
 		return errno;
 	}
 
-	cheia = citire_piese(fintrare);
-	if (0 != cheia)
-		return cheia;			// errno
+	i = citire_piese(fintrare);
+	if (0 != i)
+		return i;			// errno
 
 	// dacă am mai multe strunguri decât piese? (n < m)
-	ultim = (n <= m) ? (n-1) : (m-1);	// minimul dintre «m» și «n»
+	ultim = (m <= n) ? m : n;		// minimul dintre «m» și «n»
 	// sortarea inițială a subșirului de min(m,n) elemente
-	msort(0, ultim);
+	msort(0, --ultim);
 #ifndef NDEBUG
-	printf("IN:");
-	for (j = 0; j < n; ++j) {
-		printf(" %hi", d[j]);
-	}
-	printf("\n\n");
+	putchar('[');
+	for (j = 0; j < n; ++j)
+		printf(" %hd", d[j]);
+	puts(" ]\n");
 #endif
 
-	// dacă n ≤ m nu se execută nimic
-	for (prim = 0, urm = m; urm < n;) {
+	// COMPLEXITATE θ(n•lg(m))
+	for (prim = 0, urm = m; urm < n;) {	// dacă n ≤ m nu se execută
 		// procesez rapid tot ce depășește maximul curent
 		do d[urm] += d[prim++];		// adaug lungimea piesei curente
 		while ((d[ultim++] <= d[urm++]) && (urm < n));
 
-		// îmbin ultimul element cu subșirul presortat
-		for (i = ultim, cheia = d[ultim]; cheia < d[i-1]; --i)
-			d[i] = d[i-1];		// mutare la dreapta o poziție
-		d[i] = cheia;			// poziția ordonată
+		// îmbin ultimul element în subșirul presortat
+		cheia = d[ultim];
+		for (i = ultim-1; d[i] > cheia; --i)
+			d[i+1] = d[i];		// mutare la dreapta o poziție
+		d[i+1] = cheia;			// poziția ordonată
 #ifndef NDEBUG
 		afisare_strunguri(prim);
 #endif
 	}
-	fprintf(fiesire, "%hi", d[ultim]);
+	fprintf(fiesire, "%hd", d[ultim]);
 	return 0;
 }
 
@@ -139,13 +140,13 @@ int citire_piese(FILE *fisier)
 	int i;
 
 	// citesc numărul de strunguri și piese
-	if (2 != fscanf(fisier, "%hi %hi", &m, &n))
+	if (2 != fscanf(fisier, "%hd %hd", &m, &n))
 		return errno;			// eroare de citire
 #ifndef NDEBUG
-	printf("m=%hi, n=%hi\n", m, n);
+	printf("m=%hd, n=%hd\n", m, n);
 #endif
 	for (i = 0; i < n; ++i)
-		fscanf(fisier, "%hi", d+i);
+		fscanf(fisier, "%hd", d+i);
 	return 0;
 }
 
@@ -157,9 +158,9 @@ void afisare_strunguri(int start)
 
 	printf("[%3i,%3i]:", start, start+m-1);
 	for (i = 0; i < m; ++i)
-		printf(" %hi", d[start+i]);
+		printf(" %hd", d[start+i]);
 	if ((start+m) < n)
-		printf(" ↦ %hi", d[start+m]);
+		printf(" ↦ %hd", d[start+m]);
 	putchar('\n');
 }
 #endif
