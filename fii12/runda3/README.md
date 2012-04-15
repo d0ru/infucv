@@ -65,10 +65,64 @@ Fișierul text `strung.out` va conține pe o singură linie numărul natural
     In: insule.in | Out: insule.out
     Timp: 0.25s | Memorie: 64 MB (din care 32 MB stivă)
 
+Pentru a atrage cât mai mulți turiști, guvernul țării Olimpia a decis să
+construiască mai multe insule artificiale, legate între ele prin poduri.
+Insulele au fost construite, iar acum sunt proiectate podurile.
+
+Harta insulelor reprezintă un tabel bidimensional format din `n × m`
+celule, fiecare celulă simbolizând o porțiune de uscat sau de apă.
+
+Se consideră că un set de celule simbolizează o insulă atunci și doar
+atunci când:
+
+1) din fiecare din aceste celule se poate ajunge în oricare alta prin
+treceri consecutive din celula curentă în cea vecină pe orizontală sau
+pe verticală;
+
+2) în afara acestui set nu mai există alte celule în care s-ar putea
+trece.
+
+Podurile vor fi proiectate conform următoarelor reguli:
+
+* fiecare pot trebuie să fie construit pe verticală sau pe orizontală;
+* podurile pot trece doar prin celulele ce simbolizează apa;
+* orice pod începe și se termină în celule ce simbolizează uscatul;
+* podurile se pot intersecta, fiind construite pe diferite nivele.
+
+Costul unui pod este egal cu numărul de celule prin care el trece.
+
+
 ### Cerință
 
 Elaborați un program care calculează costul sumar minimal `s` al unui
 grup de poduri ce ar permite turiștilor să viziteze toate insulele.
+
+### Date de intrare
+
+Fișierul text `insule.in` conține pe prima linie numerele întregi
+`n m`, separate prin spațiu. Fiecare din următoarele «n» linii ale
+fișierului de intrare conține câte «m» caractere ce simbolizează
+apa (0) sau uscatul (1).
+
+### Date de ieșire
+
+Fișierul text `insule.out` va conține pe o singură linie numărul întreg
+`s`. Dacă grupul de poduri nu poate fi construit, în fișierul de ieșire
+se va scrie numărul `-1`.
+
+    Exemplu
+    -------
+    [insule.in]     [insule.out]
+    5 5             8
+    01110
+    00100
+    10010
+    00100
+    10001 
+
+### Restricții și precizări
+
+* ` 1 ≤ n,m ≤ 500`
 
 
 ## Problema 3: Dame
