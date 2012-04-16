@@ -1,16 +1,17 @@
 # FII'12 runda nr. 1
 
-Data început: 26.03.2012  
-Data sfârșit: 11:59 01.04.2012
+`Dată început: 2012-03-26 00:00:00`  
+`Dată sfârşit: 2012-04-01 23:59:59`
 
 
 ## Problema 1: Inversiuni
 
+    In: inversiuni.in | Out: inversiuni.out
+    Timp: n/a | Memorie: n/a
+
 Fie `x1, x2,.. xn` o secvență de «n» numere întregi distincte.
 Perechea `(i,j)` se numește inversiune dacă `xi > xj` cu `1 ≤ i < j ≤ n`.
-
-Exemplu: secvența "2 4 3 1 5 6 9" are 4 inversiuni.
-
+De exemplu, secvența "2 4 3 1 5 6 9" are 4 inversiuni.
 
 ### Date de intrare
 
@@ -20,18 +21,30 @@ specifică numărul de numere întregi din secvență. Acesta nu face parte
 din secvență. Numerele pot fi separate prin spațiu, tab sau linie nouă.
 Date din fișierul de intrare se consideră a fi corecte.
 
-
 ### Date de ieșire
 
 Fișierul «inversiuni.out» conține pe câte o linie separată numărul de
 inversiuni corespunzător fiecărei secvențe din fișierul de intrare.
-
 
 ### Cerință
 
 Scrieți un program care pentru fiecare secvență de numere citită din
 fișierul de intrare, scrie în fișierul de ieșire numărul de inversiuni
 din secvență. Fiecare rezultat va fi scris pe o linie separată.
+
+    Exemplu
+    -------
+    [inversiuni.in]     [inversiuni.out]
+    4                   0
+    5 6 7 8
+    5                   10
+    5 4 3 2 1
+    1                   0
+    128
+
+### Restricții și precizări
+
+* ` 1 ≤ n ≤ 10000`
 
 
 ## Problema 2: Cutii
