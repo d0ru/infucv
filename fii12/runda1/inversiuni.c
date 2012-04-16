@@ -32,9 +32,8 @@ int nr_inversiuni(unsigned short int dimensiune, int secventa[]);
  * eliberată înainte de citirea următoarei secvențe de numere.
  * Am folosit "int" pentru numere întregi generice în limbajul C.
  *
- * Calculul numărului de inversiuni are complexitatea timp O(n²) și
- * constă în compararea fiecărui număr întreg din vector cu toate
- * numerele din vector ce se găsesc înaintea lui.
+ * Pentru calculul numărului de inversiuni am folosit algoritmul
+ * “merge sort” de complexitate θ(n•lg(n)).
  * Numărul maxim de inversiuni se obține când toate numerele sunt
  * sortate în ordine strict descrescătoare.
  *
@@ -68,13 +67,13 @@ int main(void)
 	// dacă fișierul de intrare este gol, bucla nu se execută
 	while (NULL != (secventa = citire_secventa(fintrare, &dimensiune))) {
 		nrinv = nr_inversiuni(dimensiune, secventa);
-		fprintf(fiesire, "%i\n", nrinv);
+		fprintf(fiesire, "%d\n", nrinv);
 		free(secventa);			// eliberează memoria alocată
 	}
 	return 0;
 }
 
-// COMPLEXITATE timp Θ(n) | spațiu Θ(n)
+// COMPLEXITATE timp θ(n) | spațiu θ(n)
 int *citire_secventa(FILE *fisier, unsigned short int *dimensiune)
 {
 	int *secventa, *numar;
@@ -87,26 +86,29 @@ int *citire_secventa(FILE *fisier, unsigned short int *dimensiune)
 
 	secventa = (int *) malloc(sizeof(int) * (*dimensiune));
 	if (NULL == secventa) {
-		fprintf(stderr, "E: nu s-a putut aloca memorie pentru o secvență de «%i» numere întregi\n", *dimensiune);
+		fprintf(stderr, "E: nu s-a putut aloca memorie pentru o secvență de «%d» numere întregi\n", *dimensiune);
 		return NULL;
 	}
 
 	// nu se verifică corectitudinea sau numărul datelor de intrare
 	for (i = 0, numar = secventa; i < *dimensiune; i++, numar++)
-		fscanf(fisier, "%i", numar);
+		fscanf(fisier, "%d", numar);
 	return secventa;
 }
 
-// COMPLEXITATE timp Θ(n²) | spațiu Θ(n)
+// COMPLEXITATE timp θ(n•lg(n)) | spațiu θ(n)
 int nr_inversiuni(unsigned short int dimensiune, int secventa[])
 {
-	int inversiuni;				// maxim 50,000,000
-	short int i, j;				// maxim 10,000
+	int cheia;
+	int i, j;				// maxim 10,000
+	int nrinv;				// maxim 50,000,000
 
-	inversiuni = 0;
-	for (j = 1; j < dimensiune; j++)
-		for (i = 0; i < j; i++)
-			if (secventa[i] > secventa[j])
-				inversiuni++;
-	return inversiuni;
+	nrinv = 0;
+	for (j = 1; j < dimensiune; j++) {
+		cheia = secventa[j];
+		for (i = j-1; (i >= 0) && (secventa[i] > cheia); --i, ++nrinv)
+			secventa[i+1] = secventa[i];
+		secventa[i+1] = cheia;
+	}
+	return nrinv;
 }
