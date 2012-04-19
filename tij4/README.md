@@ -176,3 +176,53 @@ Câteva etichete *doc* utilizate frecvent:
 Java recomandă un [stil de cod][2] descris în „Code Conventions for the Java Programming Language”.
 
 [2]: http://java.sun.com/docs/codeconv/index.html
+
+
+Operatori
+---------
+
+Aproape toți operatorii lucrează doar cu tipuri primitive. Excepțiile sunt „**=**”, „**==**” și „**!=**” care lucrează cu toate obiectele. În plus, clasa **String** suportă „**+**” și „**+=**”.
+
+Oricând manipulezi un obiect, de fapt manipulezi o referință. Asta înseamnă că instrucțiunea _c = d_ pentru obiecte va face ca ambele variabile să indice către același obiect care inițial era indicat doar de _d_.
+
+Operatorii logici ȘI `&&`, SAU `||` sau NEGAȚIE `!` pot fi aplicați doar expresiilor sau operatorilor _boolean_. Orice expresie logică va fi evaluată doar până când valoarea expresiei poate fi determinată neambiguu — fenomenul este numit _scurt-circuit_.
+
+Referitor la operațiile pe biți, tipul _boolean_ este tratat ca o valoare pe un bit.
+
+### Operatorii de deplasare
+
+Pot fi folosiți doar cu primitive numere întregi.
+Deplasarea la stânga `<<` se face cu adăugare de zerouri la biții cu pondere mică (ce din dreapta).
+Deplasarea la dreapta `>>` se face prin adăugarea bitului de semn (0 pozitiv, 1 negativ) la biții cu pondere mare (cei din stânga). Java a adăugat și deplasarea la dreapta fără semn `>>>` ce folosește extensia zero (0).
+
+Deplasarea pe biți (sau orice operație matematică) a unui _char_, _byte_ sau _short_ se face prin promovare la _int_, iar rezultatul va fi tot _int_.
+
+### Operatorii de turnare
+
+Java permite turnarea oricărui tip primitiv în alt tip primitiv, cu excepția _boolean_ ce nu permite nici un fel de turnare.
+
+### Operatorul virgulă
+
+Virgula poate apare într-un program Java în două ipostaze: separator sau operator.
+Separatorul virgulă este folosit pentru a separa definiții a multiple variabile de același tip sau argumentele de metodă.
+
+Operatorul virgulă are o singură utilizare în Java: expresia de control a buclelor „for”. Instrucțiunile separate prin virgulă într-o buclă „for” sunt garantate că vor fi executate secvențial.
+
+### Notația exponențială
+
+În știință și inginerie „e” reprezintă baza logaritmului natural, aproximativ 2.718.
+În limbajele C, C++ și Java notația `e` reprezintă „10 la puterea”. De exemplu expresia _0.19e-23f_ reprezintă _0.19×10⁻²³_. Compilatorul consideră implicit numerele exponențiale ca fiind de tipul „_double_”.
+
+
+Controlul execuției
+-------------------
+
+Java a adoptat toate instrucțiunile de control al execuției din limbajul C: _if-else_, _while_, _do-while_, _for_, _break_, _continue_, _switch_, _return_.
+
+### Sintaxa «foreach»
+
+Java introduce o varianție a lui „for” mai succintă pentru utilizare cu vectori sau recipiente. Nu mai ai nevoie de un „int” pentru a număra într-o secvență de elementele.
+
+    for(float x : numeVector) {..}
+
+Aceast exemplu definește o variabilă «x» de tipul „float” și secvențial asignează fiecare element din «numeVector» la «x».
