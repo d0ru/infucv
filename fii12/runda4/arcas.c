@@ -49,7 +49,8 @@ int nt;					// numărul de ținte
 int nr;					// numărul de runde
 
 int arcasi[MAXTINTE * 2];		// ranguri arcași
-int cast[MAXTINTE];			// arcași câștigători
+int arcasu;
+int cast[MAXTINTE * 2];			// arcași câștigători
 int perd[MAXTINTE];			// arcași perdanți
 
 // citesc dimensiuni și rangurile tuturor arcașilor
@@ -60,14 +61,15 @@ int citire_arcasi(FILE *fisier);
 void afisare_arcasi(void);
 
 // afișare ranguri arcași în runda curentă
-void afisare_runda(int runda);
+void afisare_runda(int prim, int runda);
 #endif
 
 // alinierea arcașilor la linia de start: inițializare cast[], perd[]
 void aliniere_start(int tinta);
 
 // calculează poziția arcașului dacă se pleacă de la ținta specificată
-int calc_pozitie(void);
+int calc_pozitie_codas(void);
+int calc_pozitie_fruntas(void);
 
 // COMPLEXITATE timp O(n³) | spațiu θ(n)
 int main(void)
@@ -76,7 +78,7 @@ int main(void)
 	FILE *fiesire;				// "w" în «arcas.out»
 	int tmax;				// ținta de plecare pentru pmin
 	int pmin;				// poziția minimă (nr. țintă)
-	int t, p;
+	int t, p, up;
 
 	fintrare = fopen("arcas.in", "r");
 	if (NULL == fintrare) {
@@ -94,21 +96,49 @@ int main(void)
 	if (0 != t)
 		return t;			// errno
 #ifndef NDEBUG
-	afisare_arcasi();
+//	afisare_arcasi();
 #endif
 
-	// probez toate țintele pentru cea mai bună performanță
-	for (pmin = MAXTINTE*2, t = 1; t <= nt; ++t) {
-		aliniere_start(t);
-		p = calc_pozitie();
+	// arcașul cu rang «1» sau doar o țintă
+	if ((1 == arcasu) || (1 == nt)) {
+		fprintf(fiesire, "1");
+		return 0;
+	}
 
-		// actualizare ținta de start pentru performanța maximă
-		if (p <= pmin) {
-			tmax = t;
-			pmin = p;
+	// optimizez căutarea în funcție de rangul arcașului tău
+	if (arcasu <= nt + 1) {
+		up = 1;
+		for (p = 0, pmin = nt*2, t = 1; t <= nt; ++t) {
+			aliniere_start(t);
+#ifndef NDEBUG
+//			printf("====== ținta #%d ======\n", t);
+#endif
+			p = calc_pozitie_fruntas();
+#ifndef NDEBUG
+			printf("- ținta start #%d ↦ poziția %d (%+d de la %d)\n", t, p, p-up < 0 ? nt+p-up : p-up, up);
+#endif
+
+			up = p;
+			// actualizare ținta de start pentru performanța maximă
+			if (p <= pmin) {
+				tmax = t;
+				pmin = p;
+			}
+		}
+	} else {
+		for (p = 0, pmin = nt*2, t = 2; t <= nt; ++t) {
+			aliniere_start(t);
+			p = calc_pozitie_codas();
 #ifndef NDEBUG
 			printf("- ținta start #%d ↦ poziția %d\n", t, p);
 #endif
+
+			// actualizare ținta de start pentru performanța maximă
+			if (p <= pmin) {
+				tmax = t;
+				pmin = p;
+			} else
+				break;
 		}
 	}
 
@@ -131,6 +161,7 @@ int citire_arcasi(FILE *fisier)
 
 	for (i = 0, arcas = arcasi; i < na; ++i, ++arcas)
 		fscanf(fisier, "%d", arcas);
+	arcasu = arcasi[0];
 	return 0;
 }
 
@@ -148,12 +179,12 @@ void afisare_arcasi(void)
 }
 
 // COMPLEXITATE θ(n)
-void afisare_runda(int runda)
+void afisare_runda(int prim, int runda)
 {
 	int *ac, *ap, i;
 
 	printf("-- runda #%d --\n", runda);
-	for (i = 1, ac = cast, ap = perd; i <= nt; ++i, ++ac, ++ap)
+	for (ac = cast+prim, ap = perd, i = 1; i <= nt; ++i, ++ac, ++ap)
 		printf("tinta#%d: %d ∘ %d\n", i, *ac, *ap);
 }
 #endif
@@ -163,8 +194,8 @@ void aliniere_start(int tinta)
 {
 	int i, j;
 
-	// aliniere arcași poziționați înaintea arcașului tău
 	--tinta;				// 1 ≤ tinta ≤ N
+	// aliniere arcași poziționați înaintea arcașului tău
 	for (i = 0, j = 1; i < tinta; ++i, ++j)
 		if (arcasi[j] < arcasi[j+1]) {
 			cast[i] = arcasi[j];
@@ -175,11 +206,11 @@ void aliniere_start(int tinta)
 		}
 
 	// așez arcașul tău la țintă
-	if (arcasi[0] < arcasi[j]) {
-		cast[i] = arcasi[0];
+	if (arcasu < arcasi[j]) {
+		cast[i] = arcasu;
 		perd[i] = arcasi[j];
 	} else {
-		perd[i] = arcasi[0];
+		perd[i] = arcasu;
 		cast[i] = arcasi[j];
 	}
 
@@ -200,77 +231,122 @@ void aliniere_start(int tinta)
 }
 
 // COMPLEXITATE O(n²)
-int calc_pozitie(void)
+int calc_pozitie_codas(void)
 {
 	int ultim;				// ultimul arcaș în poziția finală
-	int i, j, r1;
-	int nrrunda, pozitie;
+	int k, p, r, s, prim;
 
-	if ((1 == arcasi[0]) || (1 == nt))	// arcașul cu rang «1»
-		return 1;
-	nrrunda = 0;
+	// caut doar un arcaș codaș (vectorul perd[])
+	assert(arcasu > nt + 1);
+
+	r = 0;					// nr. rundei curente
+	prim = 0;				// început vector cast[]
 	ultim = 2 * nt;
-	while ((1 != perd[0]) || (ultim > nt + 1)) {
-		++nrrunda;
-		r1 = cast[0];			// salvez rangul perdantului #1
-		// permutări [1 … N-1]
-		for (i = 0, j = 1; j < nt; ++i, ++j) {
-			if (perd[i] > cast[j]) {
-				cast[i] = cast[j];
-			} else {
-				cast[i] = perd[i];
-				perd[i] = cast[j];
+	do {
+		++r;
+		// pierzătorul de la ținta «1» se mută la ținta «N»
+		cast[prim + nt] = cast[prim];	// permutări [1 … N-1]
+
+		// este nevoie de o interschimbare cast[] ↔ perd[]?
+		for (p = 1, k = ++prim+1; p < nt; ++p, ++k) {
+			if (cast[k] > perd[p]) {
+				s = cast[k];
+				cast[k] = perd[p];
+				perd[p] = s;
 			}
-			if ((ultim == perd[i]) && (0 != i)) {
-				if (ultim == arcasi[0]) {
-#ifndef NDEBUG
-//					printf("arcaș codaș rang#%d, la runda «%d» are ținta #%d\n", ultim, nrrunda, (i+1));
-#endif
-					return (i + 1);
-				}
+			if (ultim == perd[p])
 				--ultim;
-			}
 		}
-		// perdantul «ultim» la ținta N?
-		if (ultim == perd[i])
-			--ultim;
 
 		// excepția locului întâi: câștigătorul rămâne la prima țintă
-		if (cast[0] < perd[0]) {
-			j = cast[0];
-			cast[0] = perd[0];
-			perd[0] = j;
-		}
-
-		// pierzătorul de la ținta «1» se mută la ținta «N»
-		assert(i == nt - 1);
-		if (perd[i] > r1) {
-			cast[i] = r1;
-		} else {
-			cast[i] = perd[i];
-			perd[i] = r1;
+		if (cast[prim] < perd[0]) {
+			s = cast[prim];
+			cast[prim] = perd[0];
+			perd[0] = s;
 		}
 #ifndef NDEBUG
-//		afisare_runda(nrrunda);
+//		afisare_runda(prim, r);
 //		printf("ultim = %d\n\n", ultim);
 #endif
-	};
-	// arcașii codași au fost eliminați până la runda curentă
-	assert(arcasi[0] <= nt + 1);
+	} while (ultim >= arcasu);
+	// maxim N-1 operații?
+	assert(prim <= nt);
+
+	// arcaș codaș (printre ultimii N-1)
+	for (p = 1; p < nt; ++p)
+		if (arcasu == perd[p])
+			break;
+	assert(1 != arcasu);
+	assert(p < nt);
+	++p;					// număr țintă
+#ifndef NDEBUG
+//	afisare_runda(prim, r);
+//	printf("arcaș codaș rang#%d, la runda «%d» are ținta #%d\n", arcasu, r, p);
+#endif
+	return p;
+}
+
+// COMPLEXITATE O(n²)
+int calc_pozitie_fruntas(void)
+{
+	int ultim;				// ultimul arcaș în poziția finală
+	int k, p, r, s, prim;
+
+	// caut doar un arcaș fruntaș (vectorul cast[])
+	assert(arcasu <= nt + 1);
+
+#ifndef NDEBUG
+//	afisare_runda(0, 0);
+#endif
+	r = 0;					// nr. rundei curente
+	prim = 0;				// început vector cast[]
+	ultim = 2 * nt;
+	do {
+		++r;
+		// pierzătorul de la ținta «1» se mută la ținta «N»
+		cast[prim + nt] = cast[prim];	// permutări [1 … N-1]
+
+		// este nevoie de o interschimbare cast[] ↔ perd[]?
+		for (p = 1, k = ++prim+1; p < nt; ++p, ++k) {
+			if (cast[k] > perd[p]) {
+				s = cast[k];
+				cast[k] = perd[p];
+				perd[p] = s;
+			}
+			if (ultim == perd[p])
+				--ultim;
+		}
+
+		// excepția locului întâi: câștigătorul rămâne la prima țintă
+		if (cast[prim] < perd[0]) {
+			s = cast[prim];
+			cast[prim] = perd[0];
+			perd[0] = s;
+		}
+#ifndef NDEBUG
+//		afisare_runda(prim, r);
+//		printf("ultim = %d\n\n", ultim);
+#endif
+	} while ((1 != perd[0]) || (ultim > nt + 1));
+	// maxim N-1 operații?
+	assert(prim <= nt);
 
 	// arcaș fruntaș (printre primii N+1)
-	for (i = 0; i < nt; ++i)
-		if (arcasi[0] == cast[i])
+	for (k = 0; k < nt; ++k)
+		if (arcasu == cast[prim+k])
 			break;
-	pozitie = i + 1;			// număr țintă
+	assert(1 != arcasu);
+	assert(k < nt);
+	++k;					// număr țintă
 #ifndef NDEBUG
-//	printf("arcaș fruntaș rang#%d, la runda «%d» are ținta #%d\n", cast[i], nrrunda, pozitie);
+//	afisare_runda(prim, r);
+//	printf("arcaș fruntaș rang#%d, la runda «%d» are ținta #%d\n", arcasu, r, k);
 #endif
-	pozitie -= (nr - nrrunda) % nt;		// T - (R % N)
-	if (pozitie <= 0)
-		pozitie += nt;
+	k -= (nr - r) % nt;			// T - (R % N)
+	if (k <= 0)
+		k += nt;
 #ifndef NDEBUG
-//	printf("arcaș fruntaș rang#%d, la runda «%d» are ținta #%d\n", cast[i], nr, pozitie);
+//	printf("arcaș fruntaș rang#%d, la runda «%d» are ținta #%d\n\n", arcasu, nr, k);
 #endif
-	return pozitie;
+	return k;
 }
