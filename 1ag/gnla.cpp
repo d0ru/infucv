@@ -141,6 +141,17 @@ bool muchie_gnla(const struct nod graf[], int nrvarf, int nod1, int nod2)
 	return false;
 }
 
+// COMPLEXITATE θ(m)#n ??
+int nrmuc_gnla(const struct nod graf[], int nrvarf)
+{
+	int i, nrmuchii;
+
+	nrmuchii = 0;
+	for (i = 1; i <= nrvarf; ++i)
+		nrmuchii += nrvec_gnla(graf, nrvarf, i);
+	return (nrmuchii / 2);
+}
+
 
 // COMPLEXITATE θ(m)#c
 void cclatviz_gnla(const struct nod graf[], int nrvarf, int nod, bool *vizitat, bool afis)

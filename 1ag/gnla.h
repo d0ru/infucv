@@ -40,6 +40,9 @@ void afvec_gnla(const struct nod graf[], int nrvarf, int nod);
 // (1 ≤ nod1 < nod2 ≤ nrvarf)
 bool muchie_gnla(const struct nod graf[], int nrvarf, int nod1, int nod2);
 
+// returnează numărul de muchii
+int nrmuc_gnla(const struct nod graf[], int nrvarf);
+
 
 // marcare componentă conexă de la «nod» cu parcurgere în lățime, afișare opțională
 void cclatviz_gnla(const struct nod graf[], int nrvarf, int nod, bool *vizitat, bool afis);
