@@ -20,29 +20,26 @@ using namespace std;
 // c, numărul de componente conexe ale grafului neorientat
 
 // COMPLEXITATE timp Θ(n²) | spațiu Θ(n²)
-int *fcitire_gnma(FILE *fisier, int *nrvarf)
+int fcitire_gnma(FILE *fisier, int **graf)
 {
 	int i, j;
-	int *graf;				 // matricea de adiacență
 	int *elem;
+	int nrvarf;
 
-	if (1 != fscanf(fisier, "%i", nrvarf))
-		return NULL;
-
-	if (*nrvarf <= 0) {
-		fprintf(stderr, "E: numărul de noduri «%d» trebuie să fie pozitiv!\n", *nrvarf);
-		return NULL;
+	if ((1 != fscanf(fisier, "%i", &nrvarf)) || (nrvarf <= 0)) {
+		*graf = NULL;
+		return -1;
 	}
 
-	graf = (int *) malloc(sizeof(int) * (*nrvarf) * (*nrvarf));
+	*graf = (int *) malloc(sizeof(int) * nrvarf * nrvarf);
 						// |V|x|V|
-	if (NULL == graf)
-		return NULL;
+	if (NULL == *graf)
+		return -1;
 
-	for (i = 0, elem = graf; i < *nrvarf; i++)
-		for (j = 0; j < *nrvarf; j++, elem++)
+	for (i = 0, elem = *graf; i < nrvarf; i++)
+		for (j = 0; j < nrvarf; j++, elem++)
 			fscanf(fisier, "%d", elem);
-	return graf;
+	return nrvarf;
 }
 
 // COMPLEXITATE timp Θ(n²) | spațiu Θ(n²)

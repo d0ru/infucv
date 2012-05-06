@@ -25,13 +25,12 @@
 // operații cu matricea de adiacență a unui graf neorientat
 int main(int argc, char *argv[])
 {
-	int i, j, v, nr;
+	int i, j, v, nr, *mat;
 	FILE *fisier;
-	int *mat;
 
 	if (argc < 2) {
 		printf("Introduceți numărul vârfurilor și matricea de adiacență a grafului neorientat:\n");
-		mat = citire_gnma(&nr);
+		nr = citire_gnma(&mat);
 	} else {
 		printf("%d %s %s\n", argc, argv[0], argv[1]);
 		fisier = fopen(argv[1], "r");
@@ -39,7 +38,7 @@ int main(int argc, char *argv[])
 			fprintf(stderr, "E: fișierul «%s» nu a putut fi deschis\n", argv[1]);
 			return errno;
 		}
-		mat = fcitire_gnma(fisier, &nr);
+		nr = fcitire_gnma(fisier, &mat);
 	}
 	if (NULL == mat) {
 		fprintf(stderr, "E: memorie insuficientă pentru matricea de adiacență\n");

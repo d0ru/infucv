@@ -11,9 +11,9 @@
 // (1 ≤ nod ≤ nrvarf)
 
 // citire matrice de adiacență
-int *fcitire_gnma(FILE *fisier, int *nrvarf);
+int fcitire_gnma(FILE *fisier, int **graf);
 // citire de la STDIN
-#define citire_gnma(N)		fcitire_gnma(stdin, N)
+#define citire_gnma(G)		fcitire_gnma(stdin, G)
 
 // citire matrice de adiacență
 void fafisare_gnma(FILE *fisier, const int *graf, int nrvarf);
