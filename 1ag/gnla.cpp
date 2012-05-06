@@ -25,61 +25,58 @@ using namespace std;
 // c, numărul de componente conexe ale grafului neorientat
 
 // COMPLEXITATE timp θ(n+m) | spațiu θ(n+m)
-struct nod *fcitire_gnla(FILE *fisier, int *nrvarf)
+int fcitire_gnla(FILE *fisier, struct nod **graf)
 {
-	int u, v;
-	struct nod *graf;			// vectorul nodurilor
+	int u, v, nrvarf;
 	struct nod *elem;
 
-	if (1 != fscanf(fisier, "%i", nrvarf))
-		return NULL;
-
-	if (*nrvarf <= 0) {
-		fprintf(stderr, "E: numărul de noduri «%d» trebuie să fie pozitiv!\n", *nrvarf);
-		return NULL;
+	if ((1 != fscanf(fisier, "%i", &nrvarf)) || (nrvarf <= 0)) {
+		*graf = NULL;
+		return -1;
 	}
 
-	graf = (struct nod *) malloc(sizeof(struct nod) * (*nrvarf));	// |V|
-	if (NULL == graf) {
+	*graf = (struct nod *) malloc(sizeof(struct nod) * nrvarf);	// |V|
+	if (NULL == *graf) {
 		fprintf(stderr, "E: nu s-a putut aloca memorie pentru vectorul nodurilor!\n");
-		return NULL;
+		return -1;
 	}
 
-	for (v = 0; v < *nrvarf; v++) {			// numărul de linii la intrare poate fi mai mic decât
-							// numărul nodurilor din graf
-		graf[v].nr = 0;				// rămâne 0 doar dacă nu există o linie ^v: la intrare
-		graf[v].urm = NULL;			// rămâne NULL dacă nu are nici un vecin
+	// numărul de linii la intrare poate fi mai mic decât numărul nodurilor din graf
+	for (v = 0; v < nrvarf; v++) {
+		(*graf)[v].nr = 0;		// rămâne 0 doar dacă nu există o linie ^v: la intrare
+		(*graf)[v].urm = NULL;		// rămâne NULL dacă nu are nici un vecin
 	}
 
 	while (1 == fscanf(fisier, "%i:", &v)) {
-		if (v < 1 || v > *nrvarf) {
-			fprintf(stderr, "E: număr de nod «%d» incorect, 1 ≤ v ≤ %d!\n", v, *nrvarf);
+		if (v < 1 || v > nrvarf) {
+			fprintf(stderr, "E: număr de nod «%d» incorect, 1 ≤ v ≤ %d!\n", v, nrvarf);
 			while (EOF != (u = fgetc(fisier)))
-				if ('\n' == u)		// ignoră tot până la sfârșit de linie
+				if ('\n' == u)	// ignoră tot până la sfârșit de linie
 					break;
 			continue;
 		}
-		graf[v-1].nr = v;			// numerotare vector de la zero
+		(*graf)[v-1].nr = v;		// numerotare vector de la zero
 
-		elem = graf + v - 1;			// elementele sunt introduse în ordinea dată
-		fscanf(fisier, "%d", &u);		// lista de vecini îl are cel puțin pe 0
+		elem = *graf + v - 1;		// elementele sunt introduse în ordinea dată
+		fscanf(fisier, "%d", &u);	// lista de vecini îl are cel puțin pe 0
 		while (u > 0) {
 			elem->urm = (struct nod *) malloc(sizeof(struct nod));
 			if (NULL == elem->urm) {
 				fprintf(stderr, "E: nu s-a putut aloca memorie pentru vecinul «%d» al nodului «%d»!\n", u, v);
 				continue;
 			}
-			elem = elem->urm;		// avansez în listă
+			elem = elem->urm;
 			elem->nr = u;
-			elem->urm = NULL;		// inițializare în caz că este ultimul element
-			fscanf(fisier, "%d", &u);	// citesc următorul vecin al lui v
+			elem->urm = NULL;
+			fscanf(fisier, "%d", &u);
 		}
 
-		while (EOF != (u = fgetc(fisier)))	// ignoră tot până la sfârșit de linie
+		// ignoră tot până la sfârșit de linie
+		while (EOF != (u = fgetc(fisier)))
 			if ('\n' == u)
 				break;
 	}
-	return graf;
+	return nrvarf;
 }
 
 // COMPLEXITATE timp θ(n+m) | spațiu θ(n+m)

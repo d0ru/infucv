@@ -21,9 +21,9 @@ struct nod {
 // (1 ≤ nod ≤ nrvarf)
 
 // citire listă de adiacență
-struct nod *fcitire_gnla(FILE *fisier, int *nrvarf);
+int fcitire_gnla(FILE *fisier, struct nod **graf);
 // citire de la STDIN
-#define citire_gnla(N)		fcitire_gnla(stdin, N)
+#define citire_gnla(G)		fcitire_gnla(stdin, G)
 
 // afișare listă de adiacență
 void fafisare_gnla(FILE *fisier, const struct nod graf[], int nrvarf);

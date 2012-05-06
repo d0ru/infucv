@@ -30,7 +30,7 @@ int main(int argc, char *argv[])
 
 	if (argc < 2) {
 		printf("Introduceți numărul vârfurilor și lista de adiacență a grafului neorientat:\n");
-		liad = citire_gnla(&nr);
+		nr = citire_gnla(&liad);
 	} else {
 		printf("%d %s %s\n", argc, argv[0], argv[1]);
 		fisier = fopen(argv[1], "r");
@@ -38,7 +38,7 @@ int main(int argc, char *argv[])
 			fprintf(stderr, "E: fișierul «%s» nu a putut fi deschis\n", argv[1]);
 			return errno;
 		}
-		liad = fcitire_gnla(fisier, &nr);
+		nr = fcitire_gnla(fisier, &liad);
 	}
 	if (NULL == liad) {
 		fprintf(stderr, "E: memorie insuficientă pentru lista de adiacență\n");
