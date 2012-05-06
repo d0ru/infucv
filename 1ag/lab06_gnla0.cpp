@@ -45,8 +45,8 @@ int main(int argc, char *argv[])
 		return errno;
 	}
 
-	afcclat_gnla(liad, nr);
+	cclat_gnla(liad, nr, true);
 	putchar('\n');
-	afccad_gnla(liad, nr);
+	ccad_gnla(liad, nr, true);
 	return 0;
 }

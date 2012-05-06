@@ -41,21 +41,21 @@ void afvec_gnla(const struct nod graf[], int nrvarf, int nod);
 bool muchie_gnla(const struct nod graf[], int nrvarf, int nod1, int nod2);
 
 
-// afisare componenta conexă de la «nod» cu parcurgere în lățime
-void afcclatviz_gnla(const struct nod graf[], int nrvarf, int nod, bool *vizitat);
+// marcare componentă conexă de la «nod» cu parcurgere în lățime, afișare opțională
+void cclatviz_gnla(const struct nod graf[], int nrvarf, int nod, bool *vizitat, bool afis);
 
-// afișare componente conexe folosind parcurgerea în lățime
-void afcclat_gnla(const struct nod graf[], int nrvarf);
+// număr componente conexe folosind parcurgerea în lățime, afișare opțională
+int cclat_gnla(const struct nod graf[], int nrvarf, bool afis);
 
 // parcurgere/vizitare în lățime (BFS)
 void vizlat_gnla(const struct nod graf[], int nrvarf, int nod);
 
 
-// afisare componenta conexă de la «nod» cu parcurgere în adâncime
-void afccadviz_gnla(const struct nod graf[], int nrvarf, int nod, bool *vizitat);
+// marcare componentă conexă de la «nod» cu parcurgere în adâncime, afișare opțională
+void ccadviz_gnla(const struct nod graf[], int nrvarf, int nod, bool *vizitat, bool afis);
 
-// afișare componente conexe folosind parcurgerea în adâncime
-void afccad_gnla(const struct nod graf[], int nrvarf);
+// număr componente conexe folosind parcurgerea în adâncime, afișare opțională
+int ccad_gnla(const struct nod graf[], int nrvarf, bool afis);
 
 // parcurgere/vizitare în adâncime (DFS)
 void vizad_gnla(const struct nod graf[], int nrvarf, int nod);

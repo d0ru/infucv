@@ -24,7 +24,7 @@ using namespace std;
 // m = |E|, numărul muchiilor grafului neorientat
 // c, numărul de componente conexe ale grafului neorientat
 
-// COMPLEXITATE timp Θ(n+m) | spațiu Θ(n+m)
+// COMPLEXITATE timp θ(n+m) | spațiu θ(n+m)
 struct nod *fcitire_gnla(FILE *fisier, int *nrvarf)
 {
 	int u, v;
@@ -82,7 +82,7 @@ struct nod *fcitire_gnla(FILE *fisier, int *nrvarf)
 	return graf;
 }
 
-// COMPLEXITATE timp Θ(n+m) | spațiu Θ(n+m)
+// COMPLEXITATE timp θ(n+m) | spațiu θ(n+m)
 void fafisare_gnla(FILE *fisier, const struct nod graf[], int nrvarf)
 {
 	int i;
@@ -99,7 +99,7 @@ void fafisare_gnla(FILE *fisier, const struct nod graf[], int nrvarf)
 	}
 }
 
-// COMPLEXITATE Θ(m)#n
+// COMPLEXITATE θ(m)#n
 int nrvec_gnla(const struct nod graf[], int nrvarf, int nod)
 {
 	int vecini;
@@ -115,7 +115,7 @@ int nrvec_gnla(const struct nod graf[], int nrvarf, int nod)
 	return vecini;
 }
 
-// COMPLEXITATE Θ(m)#n
+// COMPLEXITATE θ(m)#n
 void afvec_gnla(const struct nod graf[], int nrvarf, int nod)
 {
 	struct nod *elem;
@@ -129,7 +129,7 @@ void afvec_gnla(const struct nod graf[], int nrvarf, int nod)
 	putchar('\n');
 }
 
-// COMPLEXITATE Θ(m)#n
+// COMPLEXITATE θ(m)#n
 bool muchie_gnla(const struct nod graf[], int nrvarf, int nod1, int nod2)
 {
 	struct nod *elem;
@@ -145,8 +145,8 @@ bool muchie_gnla(const struct nod graf[], int nrvarf, int nod1, int nod2)
 }
 
 
-// COMPLEXITATE Θ(m)#c
-void afcclatviz_gnla(const struct nod graf[], int nrvarf, int nod, bool *vizitat)
+// COMPLEXITATE θ(m)#c
+void cclatviz_gnla(const struct nod graf[], int nrvarf, int nod, bool *vizitat, bool afis)
 {
 	int i, k;
 	queue<int> qi;
@@ -157,11 +157,12 @@ void afcclatviz_gnla(const struct nod graf[], int nrvarf, int nod, bool *vizitat
 	if (vizitat[nod])			// nu ar trebui să fie apelat
 		return;
 	vizitat[nod] = true;
-	qi.push(nod);				// Q <= nod
-	printf("   %d", nod+1);			// CALL vizitare(nod)
+	qi.push(nod);				// Q ← nod
+	if (afis)
+		printf("   %d", nod+1);		// CALL vizitare(nod)
 
 	while (!qi.empty()) {			// Q ≠ ∅
-		k = qi.front();			// Q => k
+		k = qi.front();			// Q → k
 		qi.pop();
 		gasit = false;
 		elem = graf[k].urm;		// parcurg lista de vecini ai lui «k»
@@ -172,37 +173,41 @@ void afcclatviz_gnla(const struct nod graf[], int nrvarf, int nod, bool *vizitat
 				continue;
 			}
 			vizitat[i] = true;
-			qi.push(i);			// Q <= i
-			printf(" → %d", elem->nr);	// CALL vizitare(i)
+			qi.push(i);		// Q ← i
+			if (afis)		// CALL vizitare(i)
+				printf(" → %d", elem->nr);
 			gasit = true;
 			elem = elem->urm;
 		}
-		if (gasit)
+		if (afis && gasit)
 			putchar('\n');
 	}
 }
 
-// COMPLEXITATE Θ(n+m)
-void afcclat_gnla(const struct nod graf[], int nrvarf)
+// COMPLEXITATE θ(n+m)
+int cclat_gnla(const struct nod graf[], int nrvarf, bool afis)
 {
 	int cc, nod;
 	bool *vizitat;				// vizitat? A/F
 
 	vizitat = mkviz(nrvarf);
 	if (NULL == vizitat)
-		return;
+		return 0;
 
-	printf("Afișare componente conexe GNLA folosind parcurgerea în lățime!\n");
+	if (afis)
+		printf("Afișare componente conexe GNLA folosind parcurgerea în lățime!\n");
 	for (cc = 0, nod = 0; nod < nrvarf;) {
 		if (vizitat[nod++])
 			continue;
-		printf("Componenta conexă «%d» începe cu nodul %d:\n", ++cc, nod);
-		afcclatviz_gnla(graf, nrvarf, nod, vizitat);
+		if (afis)
+			printf("Componenta conexă «%d» începe cu nodul %d:\n", ++cc, nod);
+		cclatviz_gnla(graf, nrvarf, nod, vizitat, afis);
 	}
 	free(vizitat);
+	return cc;
 }
 
-// COMPLEXITATE Θ(n+m)#c
+// COMPLEXITATE θ(n+m)#c
 void vizlat_gnla(const struct nod graf[], int nrvarf, int nod)
 {
 	bool *vizitat;				// vizitat? A/F
@@ -211,13 +216,13 @@ void vizlat_gnla(const struct nod graf[], int nrvarf, int nod)
 	if (NULL == vizitat)
 		return;
 
-	afcclatviz_gnla(graf, nrvarf, nod, vizitat);
+	cclatviz_gnla(graf, nrvarf, nod, vizitat, true);
 	free(vizitat);
 }
 
 
-// COMPLEXITATE Θ(m)#c
-void afccadviz_gnla(const struct nod graf[], int nrvarf, int nod, bool *vizitat)
+// COMPLEXITATE θ(m)#c
+void ccadviz_gnla(const struct nod graf[], int nrvarf, int nod, bool *vizitat, bool afis)
 {
 	int i, k, adancime;
 	stack<int> si;
@@ -228,19 +233,24 @@ void afccadviz_gnla(const struct nod graf[], int nrvarf, int nod, bool *vizitat)
 	if (vizitat[nod])			// nu ar trebui să fie apelat
 		return;
 	vizitat[nod] = true;
-	si.push(nod);				// S <= nod
-	printf("   %d", nod+1);			// CALL vizitare(nod)
-	adancime = 2;				// primul în ierarhie
 
-	cap = true;				// s-a afișat capul componentei conexe
+	if (afis) {
+		printf("   %d", nod+1);		// CALL vizitare(nod)
+		adancime = 2;			// primul în ierarhie
+		cap = true;			// s-a afișat capul componentei conexe
+		primul = false;			// ramură nouă?
+	}
+
+	si.push(nod);				// S ← nod
 	gasit = false;				// dacă nodul curent mai are vecini nevizitați
-	primul = false;				// ramură nouă?
 	while (!si.empty()) {			// S ≠ ∅
 		if (!gasit) {
-			k = si.top();		// S => k
+			k = si.top();		// S → k
 			si.pop();
-			adancime--;
-			primul = true;
+			if (afis) {
+				adancime--;
+				primul = true;
+			}
 		}
 		gasit = false;
 		elem = graf[k].urm;		// parcurg lista de vecini ai lui «k»
@@ -251,15 +261,18 @@ void afccadviz_gnla(const struct nod graf[], int nrvarf, int nod, bool *vizitat)
 				continue;
 			}
 			vizitat[i] = true;
-			si.push(k);			// S <= k
-			if (primul && !cap)
-				printf("\n%*c", 4*adancime, ' ');
-			else
-				cap = false;		// la următoarele se afișează linie nouă cu indentare
-			printf(" → %d", elem->nr);	// CALL vizitare(i)
+			si.push(k);		// S ← k
+			if (afis) {
+				if (primul && !cap)
+					printf("\n%*c", 4*adancime, ' ');
+				else
+					// la următoarele se afișează linie nouă cu indentare
+					cap = false;
+				printf(" → %d", elem->nr);
+				adancime++;
+				primul = false;
+			}
 			k = i;
-			adancime++;
-			primul = false;
 			gasit = true;
 			break;			// am găsit cel puțin un nod nevizitat adiacent cu k
 		}
@@ -267,27 +280,30 @@ void afccadviz_gnla(const struct nod graf[], int nrvarf, int nod, bool *vizitat)
 	putchar('\n');
 }
 
-// COMPLEXITATE Θ(n+m)
-void afccad_gnla(const struct nod graf[], int nrvarf)
+// COMPLEXITATE θ(n+m)
+int ccad_gnla(const struct nod graf[], int nrvarf, bool afis)
 {
 	int cc, nod;
 	bool *vizitat;				// vizitat? A/F
 
 	vizitat = mkviz(nrvarf);
 	if (NULL == vizitat)
-		return;
+		return 0;
 
-	printf("Afișare componente conexe GNLA folosind parcurgerea în adâncime!\n");
+	if (afis)
+		printf("Afișare componente conexe GNLA folosind parcurgerea în adâncime!\n");
 	for (cc = 0, nod = 0; nod < nrvarf;) {
 		if (vizitat[nod++])
 			continue;
-		printf("Componenta conexă «%d» începe cu nodul %d:\n", ++cc, nod);
-		afccadviz_gnla(graf, nrvarf, nod, vizitat);
+		if (afis)
+			printf("Componenta conexă «%d» începe cu nodul %d:\n", ++cc, nod);
+		ccadviz_gnla(graf, nrvarf, nod, vizitat, afis);
 	}
 	free(vizitat);
+	return cc;
 }
 
-// COMPLEXITATE Θ(n+m)#c
+// COMPLEXITATE θ(n+m)#c
 void vizad_gnla(const struct nod graf[], int nrvarf, int nod)
 {
 	bool *vizitat;				// vizitat? A/F
@@ -296,6 +312,6 @@ void vizad_gnla(const struct nod graf[], int nrvarf, int nod)
 	if (NULL == vizitat)
 		return;
 
-	afccadviz_gnla(graf, nrvarf, nod, vizitat);
+	ccadviz_gnla(graf, nrvarf, nod, vizitat, true);
 	free(vizitat);
 }
