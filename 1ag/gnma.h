@@ -34,4 +34,7 @@ void vizlat_gnma(const int *graf, int nrvarf, int nod);
 
 // parcurgere în adâncime (DFS)
 void vizad_gnma(const int *graf, int nrvarf, int nod);
+
+// determină un ciclu eulerian (v0 = nod = vn)
+void rosenstiehl_gnma(const int *graf, int nrvarf, int nod);
 #endif

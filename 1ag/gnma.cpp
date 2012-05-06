@@ -176,3 +176,37 @@ void vizad_gnma(const int *graf, int nrvarf, int nod)
 	putchar('\n');
 	free(vizitat);
 }
+
+// COMPLEXITATE O(n²)
+void rosenstiehl_gnma(int *graf, int nrvarf, int nod)
+{			//!const
+	queue<int> qi;
+	stack<int> si;
+	int u, v;
+
+	--nod;
+	si.push(nod);				// S ← nod
+	while (!si.empty()) {			// S ≠ ∅
+		u = si.top();			// S → u
+		si.pop();
+		for (v = 0; v < nrvarf; ++v) {
+			if (0 == graf[u*nrvarf + v])	// [u,v] ∉ E
+				continue;
+			graf[u*nrvarf + v] = 0;	// marchez muchia [u,v] vizitată
+						// prin eliminare
+			graf[v*nrvarf + u] = 0;
+			si.push(u);		// S ← u
+			u = v;
+			v = -1;			// v = 0
+		}
+		qi.push(u);			// Q ← u
+	}
+
+	printf("Ciclu eulerian de la nodul «%d»:", nod+1);
+	while (!qi.empty()) {
+		u = qi.front();			// Q → u
+		qi.pop();
+		printf(" %d", u+1);
+	}
+	putchar('\n');
+}
