@@ -30,7 +30,7 @@ int main(int argc, char *argv[])
 
 	if (argc < 2) {
 		printf("Introduceți numărul muchiilor și matricea de muchii a grafului neorientat:\n");
-		mat = citire_gnmm(&nrmuchii);
+		nrmuchii = citire_gnmm(&mat);
 	} else {
 		printf("%d %s %s\n", argc, argv[0], argv[1]);
 		fisier = fopen(argv[1], "r");
@@ -38,7 +38,7 @@ int main(int argc, char *argv[])
 			fprintf(stderr, "E: fișierul «%s» nu a putut fi deschis\n", argv[1]);
 			return errno;
 		}
-		mat = fcitire_gnmm(fisier, &nrmuchii);
+		nrmuchii = fcitire_gnmm(fisier, &mat);
 	}
 	if (NULL == mat) {
 		fprintf(stderr, "E: memorie insuficientă pentru matricea de muchii\n");

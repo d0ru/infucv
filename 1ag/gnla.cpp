@@ -30,7 +30,7 @@ int fcitire_gnla(FILE *fisier, struct nod **graf)
 	int u, v, nrvarf;
 	struct nod *elem;
 
-	if ((1 != fscanf(fisier, "%i", &nrvarf)) || (nrvarf <= 0)) {
+	if ((1 != fscanf(fisier, "%d", &nrvarf)) || (nrvarf <= 0)) {
 		*graf = NULL;
 		return -1;
 	}
@@ -47,7 +47,7 @@ int fcitire_gnla(FILE *fisier, struct nod **graf)
 		(*graf)[v].urm = NULL;		// rămâne NULL dacă nu are nici un vecin
 	}
 
-	while (1 == fscanf(fisier, "%i:", &v)) {
+	while (1 == fscanf(fisier, "%d:", &v)) {
 		if (v < 1 || v > nrvarf) {
 			fprintf(stderr, "E: număr de nod «%d» incorect, 1 ≤ v ≤ %d!\n", v, nrvarf);
 			while (EOF != (u = fgetc(fisier)))

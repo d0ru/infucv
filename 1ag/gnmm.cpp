@@ -27,29 +27,25 @@ using namespace std;
 // c, numărul de componente conexe ale grafului neorientat
 
 // COMPLEXITATE timp Θ(m) | spațiu Θ(m)
-int *fcitire_gnmm(FILE *fisier, int *nrmuchii)
+int fcitire_gnmm(FILE *fisier, int **graf)
 {
-	int i, m;
-	int *graf;				// matricea muchiilor (2x|E|)
+	int i, m, nrmuchii;
 	int *elem;
 
-	if (1 != fscanf(fisier, "%i", nrmuchii))
-		return NULL;
-
-	if (*nrmuchii <= 0) {
-		fprintf(stderr, "E: numărul de muchii «%d» trebuie să fie pozitiv!\n", *nrmuchii);
-		return NULL;
+	if ((1 != fscanf(fisier, "%d", &nrmuchii)) || (nrmuchii <= 0)) {
+		*graf = NULL;
+		return -1;
 	}
 
-	m = (*nrmuchii) * 2;
-	graf = (int *) calloc(m, sizeof(int));	// 2x|E|
-	if (NULL == graf)
-		return NULL;
+	m = nrmuchii * 2;
+	*graf = (int *) calloc(m, sizeof(int));	// 2x|E|
+	if (NULL == *graf)
+		return -1;
 
-	elem = graf;
+	elem = *graf;
 	for (i = 0; i < m; i++)
 		fscanf(fisier, "%d", elem++);
-	return graf;
+	return nrmuchii;
 }
 
 // COMPLEXITATE timp Θ(m) | spațiu Θ(m)

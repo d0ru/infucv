@@ -26,7 +26,7 @@ int fcitire_gnma(FILE *fisier, int **graf)
 	int *elem;
 	int nrvarf;
 
-	if ((1 != fscanf(fisier, "%i", &nrvarf)) || (nrvarf <= 0)) {
+	if ((1 != fscanf(fisier, "%d", &nrvarf)) || (nrvarf <= 0)) {
 		*graf = NULL;
 		return -1;
 	}

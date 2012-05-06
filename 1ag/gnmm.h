@@ -19,9 +19,9 @@
 // nrmuchii = |E|, numărul muchiilor grafului neorientat
 
 // citire listă de muchii
-int *fcitire_gnmm(FILE *fisier, int *nrmuchii);
+int fcitire_gnmm(FILE *fisier, int **graf);
 // citire de la STDIN
-#define citire_gnmm(M)		fcitire_gnmm(stdin, M)
+#define citire_gnmm(G)		fcitire_gnmm(stdin, G)
 
 // afișare listă de muchii
 void fafisare_gnmm(FILE *fisier, const int *graf, int nrmuchii);
