@@ -26,7 +26,7 @@ using namespace std;
 // m = |E|, numărul muchiilor grafului neorientat
 // c, numărul de componente conexe ale grafului neorientat
 
-// COMPLEXITATE timp Θ(m) | spațiu Θ(m)
+// COMPLEXITATE timp θ(m) | spațiu θ(m)
 int fcitire_gnmm(FILE *fisier, int **graf)
 {
 	int i, m, nrmuchii;
@@ -48,7 +48,7 @@ int fcitire_gnmm(FILE *fisier, int **graf)
 	return nrmuchii;
 }
 
-// COMPLEXITATE timp Θ(m) | spațiu Θ(m)
+// COMPLEXITATE timp θ(m) | spațiu θ(m)
 void fafisare_gnmm(FILE *fisier, const int *graf, int nrmuchii)
 {
 	int i;
@@ -61,7 +61,7 @@ void fafisare_gnmm(FILE *fisier, const int *graf, int nrmuchii)
 	putchar('\n');
 }
 
-// COMPLEXITATE Θ(m)
+// COMPLEXITATE θ(m)
 int nrvarf_gnmm(const int *graf, int nrmuchii)
 {
 	int i, m, max;
@@ -73,7 +73,7 @@ int nrvarf_gnmm(const int *graf, int nrmuchii)
 	return max;
 }
 
-// COMPLEXITATE Θ(m)
+// COMPLEXITATE θ(m)
 int nrvec_gnmm(const int *graf, int nrmuchii, int nod)
 {
 	int i, m, vecini;
@@ -85,7 +85,7 @@ int nrvec_gnmm(const int *graf, int nrmuchii, int nod)
 	return vecini;
 }
 
-// COMPLEXITATE Θ(m)
+// COMPLEXITATE θ(m)
 void afvec_gnmm(const int *graf, int nrmuchii, int nod)
 {
 	int i;
@@ -99,7 +99,7 @@ void afvec_gnmm(const int *graf, int nrmuchii, int nod)
 	putchar('\n');
 }
 
-// COMPLEXITATE Θ(m)
+// COMPLEXITATE θ(m)
 bool muchie_gnmm(const int *graf, int nrmuchii, int nod1, int nod2)
 {
 	int i;
@@ -117,7 +117,7 @@ bool muchie_gnmm(const int *graf, int nrmuchii, int nod1, int nod2)
 	return false;
 }
 
-// COMPLEXITATE Θ(n+m²)#c
+// COMPLEXITATE θ(n+m²)#c
 void vizlat_gnmm(const int *graf, int nrmuchii, int nod)
 {
 	int i, k, l, nrvarf;
@@ -159,7 +159,7 @@ void vizlat_gnmm(const int *graf, int nrmuchii, int nod)
 	free(vizitat);
 }
 
-// COMPLEXITATE Θ(n+m²)#c
+// COMPLEXITATE θ(n+m²)#c
 void vizad_gnmm(const int *graf, int nrmuchii, int nod)
 {
 	int i, k, l, nrvarf, adancime;
