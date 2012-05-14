@@ -16,7 +16,7 @@
 
 // nrvarf = |V|, numărul nodurilor grafului neorientat
 // (1 ≤ nod ≤ nrvarf)
-// nrmuchii = |E|, numărul muchiilor grafului neorientat
+// nrmuchii = |E| / 2, numărul muchiilor unice ale grafului neorientat
 
 // citire listă de muchii
 int fcitire_gnmm(FILE *fisier, int **graf);
@@ -26,7 +26,7 @@ int fcitire_gnmm(FILE *fisier, int **graf);
 // afișare listă de muchii
 void fafisare_gnmm(FILE *fisier, const int *graf, int nrmuchii);
 // afișare la STDOUT
-#define afisare_gnmm(G,M)	fafisare_gnmm(stdout, G,M)
+#define afisare_gnmm(G,M)	fafisare_gnmm(stdout, G, M)
 
 // returnează numărul vârfurilor
 int nrvarf_gnmm(const int *graf, int nrmuchii);
