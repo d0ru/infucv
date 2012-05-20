@@ -34,6 +34,109 @@ Un **graf conex** este un graf fără componente izolate, adică între oricare 
 
 Se numește **componentă conexă** un subgraf conex maximal. Orice graf conex are o singură componentă conexă. Orice graf neconex se împarte în două sau mai multe componente conexe.
 
+### Moduri de reprezentare
+
+1) *Matricea de adiacență* este o matrice `A ∈ M[n×n]` unde `n = |V|` iar `a[i,j] = 1` dacă există o muchie între nodurile «i» și «j», sau `a[i,j] = 0` în caz contrar. Pentru un graf neorientat această matrice este simetrică.
+
+2) *Matricea costurilor* reprezintă o variație a matricei de adiacență în care fiecare muchie are un cost `d`.
+Valorile matricii se definesc astfel:
+
+* `a[i,i] = 0`
+
+* `a[i,j] = d > 0` dacă muchia [i, j] ∈ E
+
+* `a[i,j] = ±∞` dacă muchia [i, j] ∉ E
+
+3) *Liste de adiacență* — sau liste de vecini, pentru fiecare nod se construiește lista nodurilor adiacente.
+Pentru un graf neorientat numărul elementelor din listele de vecini este `2 × |E|` deoarece orice muchie [u,v] va fi prezentă atât în lista nodului «u» cât și cea a nodului «v».
+
+Aceste liste de adiacență pot fi implementate prin vectori (CAP+LISTA), liste simple sau dublu înlănțuite.
+
+4) *Lista de muchii* — sau matricea de muchii — într-o matrice `2 x |E|` sunt reținute toate muchiile [u,v], pe prima linie este «u» iar pe a doua linie este «v».
+
+### Parcurgerea grafurilor
+
+1) Parcurgerea în lățime
+
+Metoda de *parcurgere în lățime* prelucrează nodurile grafului în felul următor:
+
+* este prelucrat nodul de pornire
+
+* sunt prelucrați toți vecinii încă nevizitați ai acestuia
+
+* se reia algoritmul cu vecinii încă nevizitați ai acestora
+
+Algoritmul de parcurgere în lățime face abstracție de forma de reprezentare a grafului neorientat.
+
+    procedura PARCURGERE_LĂȚIME(graf, nrvarf, nod)
+      INTRARE: graf — graful neorientat
+               nrvarf — numărul de vârfuri
+               nod — vârful de pornire
+      for i ← 1,n do
+        vizitat[i] ← false
+      sfârșit «for»
+      prelucrează_nod(nod)
+      vizitat[nod] ← true        // nodul de pornire este prelucrat
+
+      Q ← nod                    // o structură de tip coadă
+      while (Q ≠ ∅)
+        k ← Q                    // extragere nod din coadă
+
+        // prelucrează toți vecinii nodului «k»
+        for (toți vecinii «v» ai lui «k»)
+          if (!vizitat[v])
+            prelucrează_nod(v)
+            vizitat[v] ← true
+            Q ← v
+        sfârșit «for»
+      sfârșit «while»
+    sfârșit procedură
+
+2) Parcurgerea în adâncime
+
+Metoda de *parcurgere în adâncime* prelucrează nodurile grafului în felul următor:
+
+* este prelucrat nodul de pornire
+
+* este prelucrat primul vecin încă nevizitat al acestuia
+
+* este prelucrat primul vecin încă nevizitat al celui prelucrat anterior
+
+* se merge în adâncime când se ajunge la un nod frunză sau pentru care toți vecinii săi au fost vizitați
+
+* se reia algoritmul cu nodul părinte al ultimului nod vizitat
+
+Algoritmul de parcurgere în adâncime face abstracție de forma de reprezentare a grafului neorientat.
+
+    procedura PARCURGERE_ADÂNCIME(graf, nrvarf, nod)
+      INTRARE: graf — graful neorientat
+               nrvarf — numărul de vârfuri
+               nod — vârful de pornire
+      for i ← 1,n do
+        vizitat[i] ← false
+      sfârșit «for»
+      prelucrează_nod(nod)
+      vizitat[nod] ← true        // nodul de pornire este prelucrat
+
+      S ← nod                    // o structură de tip stivă
+      găsit ← false              // nodul curent mai are vecini nevizitați?
+      while (S ≠ ∅)
+        if (!găsit)
+          k ← S                  // extragere nod din stivă
+
+        găsit ← false
+        // prelucrează primul vecin nevizitat al nodului «k» (dacă există)
+        for (toți vecinii «v» ai lui «k»)
+          if (!vizitat[v])
+            prelucrează_nod(v)
+            vizitat[v] ← true
+            S ← k                // inserare nod «k» în stivă
+            găsit ← true         // am găsit un vecin nevizitat
+            break                // întrerupe bucla «for»
+        sfârșit «for»
+      sfârșit «while»
+    sfârșit procedură
+
 
 Grafuri euleriene
 -----------------
@@ -99,6 +202,9 @@ Propriețăți ale arborilor liberi:
 Lungimea drumului de la rădăcină la un vârf se numește **adâncimea** vârfului.
 Toate vârfurile ce au aceeași adâncime se spune că sunt pe același nivel.
 
+Lungimea celui mai lung drum de la rădăcină la o frunză este **înălțimea arborelui**.
+Nivelul unui vârf se determină ca diferența dintre înălțimea arborelui și adâncimea acestui vârf.
+
 Un **arbore binar** este un arbore cu rădăcină în care fiecare vârf are cel mult doi descendenți: stâng, drept.
 Arborele binar fără vârfuri se numește **arbore vid** sau **arbore nul**.
 
@@ -153,30 +259,33 @@ Am utilizat o stivă «S» în care sunt introduse nodurile parcurse în adânci
 Parcurgerea se termină în momentul în care stiva este vidă.
 
     procedura PARCURGERE_ARBORE_BINAR(rad, st[], dr[])
-      S ← rad
-      
+      for i ← 1,n do
+        vizitat[i] ← false
+      sfârșit «for»
+
+      S ← rad                    // o structură de tip stivă
       while (S ≠ ∅)
         k ← S
-        
+
         // parcurgere în adâncime
         while (0 ≠ st[k] && !vizitat[st[k]])
           prelucrează_nod(k)     // PRE
-          vizitat[k] = true      // PRE
+          vizitat[k] ← true      // PRE
           S ← k
-          k = st[k]
+          k ← st[k]
         sfârșit «while»
-        
+
         // nod nevizitat?
         if (!vizitat[k])         // PRE+IN
           prelucrează_nod(k)     // PRE+IN
-          vizitat[k] = true      // PRE+IN
-        
+          vizitat[k] ← true      // PRE+IN
+
         // subarbore drept nevizitat?
         if (0 ≠ dr[k] && !vizitat[dr[k]])
           S ← k                  // POST
           S ← dr[k]
         else                     // POST
           prelucrează_nod(k);    // POST
-          vizitat[k] = true;     // POST
+          vizitat[k] ← true;     // POST
       sfârșit «while»
     sfârșit procedură
