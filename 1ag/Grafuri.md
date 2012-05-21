@@ -73,6 +73,7 @@ Algoritmul de parcurgere în lățime face abstracție de forma de reprezentare 
                nr — numărul de vârfuri sau
                   — numărul de muchii (pentru reprezentarea MM)
                nod — vârful de pornire
+
       for i ← 1,n do
         vizitat[i] ← false
       sfârșit «for»
@@ -114,6 +115,7 @@ Algoritmul de parcurgere în adâncime face abstracție de forma de reprezentare
                nr — numărul de vârfuri sau
                   — numărul de muchii (pentru reprezentarea MM)
                nod — vârful de pornire
+
       for i ← 1,n do
         vizitat[i] ← false
       sfârșit «for»
@@ -132,7 +134,7 @@ Algoritmul de parcurgere în adâncime face abstracție de forma de reprezentare
           if (!vizitat[v])
             prelucrează_nod(v)
             vizitat[v] ← true
-            găsit ← true         // am găsit un vecin nevizitat
+            găsit ← true
             if («v» nu este ultimul vecin al nodului «u»)
               S ← u
             u ← v                // pasul de continuare a buclei «while»
@@ -153,12 +155,12 @@ Muchiile unui graf sunt clasificate în două categorii:
 
 * muchie de întoarcere — nu face parte din arborele de acoperire
 
-Vectorul `pas[]` reprezintă pasul la care un nod este vizitat.
-Vectorul `mic[]` este calculat pentru fiecare nod cu formula:
+Vectorul `pasu[]` reprezintă pasul la care un nod este vizitat.
+Vectorul `mini[]` este calculat pentru fiecare nod cu formula:
 
-                    / pas[u] 
-    mic[u] = minim ⟨  pas[i] dacă [u,i] este muchie de întoarcere
-                    \ mic[v] pentru ∀v descendent direct al lui «u»
+                     / pasu[u] 
+    mini[u] = minim ⟨  pasu[i] pentru ∀i: [u,i] este muchie de întoarcere
+                     \ mini[v] pentru ∀v descendent direct al lui «u»
 
 Algoritmul de căutare a muchiilor critice face abstracție de forma de reprezentare a grafului neorientat.
 
@@ -169,67 +171,67 @@ Algoritmul de căutare a muchiilor critice face abstracție de forma de reprezen
                nod — vârful de pornire
 
       // I: prima parcurgere construiește vectorii pasu[] și mini[]
-      for i ← 1,n do
-        vizitat[i] ← false
+      for k ← 1,n do
+        vizitat[k] ← false
       sfârșit «for»
-      vizitat[u] ← true
+      vizitat[nod] ← true
+      contuar ← 1
       tata[nod] ← 0
       pasu[nod] ← 1              // pasul la care a fost vizitat nodul «u»
       mini[nod] ← 1              // minumul calculat pentru nodul «u»
 
       S ← nod                    // adaugă nod în stivă
       găsit ← false
-      while (S ≠ ∅)              // parcurg toate nodurile
+      while (S ≠ ∅)
         if (!găsit)
           u ← S                  // extrage nod din stivă
 
         găsit ← false
-        // prelucrează toți vecinii nodului «u»
         for (toți vecinii «v» ai lui «u»)
-          if (!vizitat[v])
+          if (!vizitat[v])       // primul vecin nevizitat al nodului «u»
             tata[v] ← u
-            pasu[v] ← pasu[u] + 1
-            mini[v] ← pasu[v]
+            contuar ← contuar + 1
+            pasu[v] ← contuar,  mini[v] ← contuar
             vizitat[v] ← true
-            găsit ← true         // am găsit un vecin nevizitat
+            găsit ← true
             S ← u
             u ← v                // pasul de continuare a buclei «while»
             break                // întrerupe bucla «for»
-          else                   // muchie de întoarcere
-            if ((tata[v] ≠ u) && (pasu[u] > pasu[v]))
-              if (mini[u] > pasu[v])
-                mini[u] ← pasu[v]
-                // actualizare valoare mini[] pentru părinți/strămoși
-                for (k ← tata[u]; mini[k] < mini[u]; k ← tata[k])
-                  mini[k] ← mini[u]
+          sfârșit «if»
+
+          // "else" muchie de întoarcere?
+          if ((tata[u] ≠ v) && (mini[u] > pasu[v]))
+            mini[u] ← pasu[v]
+            // actualizare valoare mini[] pentru părinte și strămoși
+            for (k ← tata[u]; mini[k] > mini[u]; k ← tata[k])
+              mini[k] ← mini[u]
           sfârșit «if»
         sfârșit «for»
       sfârșit «while»
 
-      // II: a doua parcurgere afișează muchiile critice
-      for i ← 1,n do
-        vizitat[i] ← false
+      // II: a doua parcurgere în adâncime afișează muchiile critice
+      for k ← 1,n do
+        vizitat[k] ← false
       sfârșit «for»
-      vizitat[u] ← true
+      vizitat[nod] ← true
 
-      S ← nod                    // adaugă nod în stivă
+      S ← nod
       găsit ← false
-      while (S ≠ ∅)              // parcurg toate nodurile
+      while (S ≠ ∅)
         if (!găsit)
-          u ← S                  // extrage nod din stivă
+          u ← S
 
         găsit ← false
-        // caută primul vecin nevizitat al nodului «u» (dacă există)
         for (toți vecinii «v» ai lui «u»)
           if (!vizitat[v])
             if (pasu[u] < mini[v])
               Output { "Muchia [u,v] este critică" }
             vizitat[v] ← true
-            găsit ← true         // am găsit un vecin nevizitat
+            găsit ← true
             if («v» nu este ultimul vecin al nodului «u»)
               S ← u
-            u ← v                // pasul de continuare a buclei «while»
-            break                // întrerupe bucla «for»
+            u ← v
+            break
         sfârșit «for»
       sfârșit «while»
     sfârșit procedură
