@@ -62,4 +62,7 @@ int ccad_gnla(const struct nod graf[], int nrvarf, bool afis);
 
 // parcurgere/vizitare în adâncime (DFS)
 void vizad_gnla(const struct nod graf[], int nrvarf, int nod);
+
+// afișare muchii critice folosind parcurgerea în adâncime (nerecursiv)
+void muchii_critice(const struct nod graf[], int nrvarf, int nod);
 #endif

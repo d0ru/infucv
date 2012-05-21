@@ -8,6 +8,7 @@
  * nod: listă vecini 0
  */
 
+#include <assert.h>
 #include <errno.h>
 #include <stdbool.h>
 #include <stdlib.h>
@@ -238,8 +239,7 @@ void ccadviz_gnla(const struct nod graf[], int nrvarf, int nod, bool *vizitat, b
 	struct nod *elem;
 
 	nod--;					// nodurile sunt numărate de la 1, nu de la 0
-	if (vizitat[nod])			// nu ar trebui să fie apelat
-		return;
+	assert(vizitat[nod] == false);
 	vizitat[nod] = true;
 
 	if (afis) {
@@ -322,4 +322,91 @@ void vizad_gnla(const struct nod graf[], int nrvarf, int nod)
 
 	ccadviz_gnla(graf, nrvarf, nod, vizitat, true);
 	free(vizitat);
+}
+
+// COMPLEXITATE θ(n+m)#c
+void muchii_critice(const struct nod graf[], int nrvarf, int nod)
+{
+	bool *vizitat, gasit;			// vizitat? A/F
+	int *tata, *pasu, *mini;
+	int contuar, k, u, v;
+	stack<int> si;
+	struct nod *elem;
+
+	nod--;					// nodurile sunt numărate de la 1, nu de la 0
+	vizitat = mkviz(nrvarf);
+	if (NULL == vizitat)
+		return;
+	tata = (int *) malloc(sizeof(int) * nrvarf);
+	pasu = (int *) malloc(sizeof(int) * nrvarf);
+	mini = (int *) malloc(sizeof(int) * nrvarf);
+
+	// I: prima parcurgere construiește vectorii pasu[] și mini[]
+	vizitat[nod] = true;
+	contuar = 1;
+	tata[nod] = 0;
+	pasu[nod] = 1;				// pasul la care a fost vizitat nodul «u»
+	mini[nod] = 1;				// minumul calculat pentru nodul «u»
+
+	si.push(nod);				// S ← nod
+	gasit = false;
+	while (!si.empty()) {			// S ≠ ∅
+		if (!gasit) {
+			u = si.top();		// u ← S
+			si.pop();
+		}
+		gasit = false;
+		for (elem = graf[u].urm; NULL != elem; elem = elem->urm) {
+			v = elem->nr - 1;	// nodurile încep de la 1, nu de la 0
+			if (!vizitat[v]) {	// primul vecin nevizitat al nodului «u»
+				tata[v] = u;
+				mini[v] = pasu[v] = ++contuar;
+				vizitat[v] = true;
+				gasit = true;
+				si.push(u);	// S ← u
+				u = v;		// pasul de continuare a buclei «while»
+				break;
+			}
+
+			// "else" muchie de întoarcere?
+			if ((tata[u] != v) && (mini[u] > pasu[v])) {
+				mini[u] = pasu[v];
+				// actualizare valoare mini[] pentru părinte și strămoși
+				for (k = tata[u]; mini[k] > mini[u]; k = tata[k])
+					mini[k] = mini[u];
+			}
+		}
+	}
+
+	// II: a doua parcurgere în adâncime afișează muchiile critice
+	for (k = 0; k < nrvarf; k++)
+		vizitat[k] = false;
+	vizitat[nod] = true;
+
+	si.push(nod);				// S ← nod
+	gasit = false;
+	while (!si.empty()) {			// S ≠ ∅
+		if (!gasit) {
+			u = si.top();		// u ← S
+			si.pop();
+		}
+		gasit = false;
+		for (elem = graf[u].urm; NULL != elem; elem = elem->urm) {
+			v = elem->nr - 1;	// nodurile încep de la 1, nu de la 0
+			if (!vizitat[v]) {	// primul vecin nevizitat al nodului «u»
+				if (pasu[u] < mini[v])
+					printf("+ [%d,%d] este muchie critică\n", u+1, v+1);
+				vizitat[v] = true;
+				gasit = true;
+				if (NULL != elem->urm)
+					si.push(u);	// S ← u
+				u = v;		// pasul de continuare a buclei «while»
+				break;
+			}
+		}
+	}
+	free(vizitat);
+	free(tata);
+	free(pasu);
+	free(mini);
 }
