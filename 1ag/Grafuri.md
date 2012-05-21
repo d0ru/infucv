@@ -38,14 +38,14 @@ Se numește **componentă conexă** un subgraf conex maximal. Orice graf conex a
 
 1) *Matricea de adiacență* este o matrice `A ∈ M[n×n]` unde `n = |V|` iar `a[i,j] = 1` dacă există o muchie între nodurile «i» și «j», sau `a[i,j] = 0` în caz contrar. Pentru un graf neorientat această matrice este simetrică.
 
-2) *Matricea costurilor* reprezintă o variație a matricei de adiacență în care fiecare muchie are un cost `d`.
+2) *Matricea costurilor* reprezintă o variație a matricei de adiacență în care fiecare muchie are un cost `d > 0`.
 Valorile matricii se definesc astfel:
 
 * `a[i,i] = 0`
 
-* `a[i,j] = d > 0` dacă muchia [i, j] ∈ E
+* `a[i,j] = d` dacă muchia `[i,j] ∈ E`
 
-* `a[i,j] = ±∞` dacă muchia [i, j] ∉ E
+* `a[i,j] = ±∞` dacă muchia `[i,j] ∉ E`
 
 3) *Liste de adiacență* — sau liste de vecini, pentru fiecare nod se construiește lista nodurilor adiacente.
 Pentru un graf neorientat numărul elementelor din listele de vecini este `2 × |E|` deoarece orice muchie [u,v] va fi prezentă atât în lista nodului «u» cât și cea a nodului «v».
@@ -68,22 +68,23 @@ Metoda de *parcurgere în lățime* prelucrează nodurile grafului în felul urm
 
 Algoritmul de parcurgere în lățime face abstracție de forma de reprezentare a grafului neorientat.
 
-    procedura PARCURGERE_LĂȚIME(graf, nrvarf, nod)
+    procedura PARCURGERE_LĂȚIME(graf, nr, nod)
       INTRARE: graf — graful neorientat
-               nrvarf — numărul de vârfuri
+               nr — numărul de vârfuri sau
+                  — numărul de muchii (pentru reprezentarea MM)
                nod — vârful de pornire
       for i ← 1,n do
         vizitat[i] ← false
       sfârșit «for»
       prelucrează_nod(nod)
-      vizitat[nod] ← true        // nodul de pornire este prelucrat
+      vizitat[nod] ← true
 
-      Q ← nod                    // o structură de tip coadă
+      Q ← nod                    // adaugă nod în coadă
       while (Q ≠ ∅)
-        k ← Q                    // extragere nod din coadă
+        u ← Q                    // extrage nod din coadă
 
-        // prelucrează toți vecinii nodului «k»
-        for (toți vecinii «v» ai lui «k»)
+        // prelucrează toți vecinii nodului «u»
+        for (toți vecinii «v» ai lui «u»)
           if (!vizitat[v])
             prelucrează_nod(v)
             vizitat[v] ← true
@@ -108,30 +109,126 @@ Metoda de *parcurgere în adâncime* prelucrează nodurile grafului în felul ur
 
 Algoritmul de parcurgere în adâncime face abstracție de forma de reprezentare a grafului neorientat.
 
-    procedura PARCURGERE_ADÂNCIME(graf, nrvarf, nod)
+    procedura PARCURGERE_ADÂNCIME(graf, nr, nod)
       INTRARE: graf — graful neorientat
-               nrvarf — numărul de vârfuri
+               nr — numărul de vârfuri sau
+                  — numărul de muchii (pentru reprezentarea MM)
                nod — vârful de pornire
       for i ← 1,n do
         vizitat[i] ← false
       sfârșit «for»
       prelucrează_nod(nod)
-      vizitat[nod] ← true        // nodul de pornire este prelucrat
+      vizitat[nod] ← true
 
-      S ← nod                    // o structură de tip stivă
-      găsit ← false              // nodul curent mai are vecini nevizitați?
+      S ← nod                    // adaugă nod în stivă
+      găsit ← false
       while (S ≠ ∅)
         if (!găsit)
-          k ← S                  // extragere nod din stivă
+          u ← S                  // extrage nod din stivă
 
         găsit ← false
-        // prelucrează primul vecin nevizitat al nodului «k» (dacă există)
-        for (toți vecinii «v» ai lui «k»)
+        // prelucrează primul vecin nevizitat al nodului «u» (dacă există)
+        for (toți vecinii «v» ai lui «u»)
           if (!vizitat[v])
             prelucrează_nod(v)
             vizitat[v] ← true
-            S ← k                // inserare nod «k» în stivă
             găsit ← true         // am găsit un vecin nevizitat
+            if («v» nu este ultimul vecin al nodului «u»)
+              S ← u
+            u ← v                // pasul de continuare a buclei «while»
+            break                // întrerupe bucla «for»
+        sfârșit «for»
+      sfârșit «while»
+    sfârșit procedură
+
+### Muchie critică
+
+O muchie este **critică** dacă prin eliminarea ei va crește numărul de componente conexe ale grafului.
+
+Proprietate: o muchie nu este critică dacă face parte din cel puțin un ciclu elementar al grafului.
+
+Muchiile unui graf sunt clasificate în două categorii:
+
+* muchie a arborelui de acoperire
+
+* muchie de întoarcere — nu face parte din arborele de acoperire
+
+Vectorul `pas[]` reprezintă pasul la care un nod este vizitat.
+Vectorul `mic[]` este calculat pentru fiecare nod cu formula:
+
+                    / pas[u] 
+    mic[u] = minim ⟨  pas[i] dacă [u,i] este muchie de întoarcere
+                    \ mic[v] pentru ∀v descendent direct al lui «u»
+
+Algoritmul de căutare a muchiilor critice face abstracție de forma de reprezentare a grafului neorientat.
+
+    procedura MUCHII_CRITICE(graf, nr, nod)
+      INTRARE: graf — graful neorientat
+               nr — numărul de vârfuri sau
+                  — numărul de muchii (pentru reprezentarea MM)
+               nod — vârful de pornire
+
+      // I: prima parcurgere construiește vectorii pasu[] și mini[]
+      for i ← 1,n do
+        vizitat[i] ← false
+      sfârșit «for»
+      vizitat[u] ← true
+      tata[nod] ← 0
+      pasu[nod] ← 1              // pasul la care a fost vizitat nodul «u»
+      mini[nod] ← 1              // minumul calculat pentru nodul «u»
+
+      S ← nod                    // adaugă nod în stivă
+      găsit ← false
+      while (S ≠ ∅)              // parcurg toate nodurile
+        if (!găsit)
+          u ← S                  // extrage nod din stivă
+
+        găsit ← false
+        // prelucrează toți vecinii nodului «u»
+        for (toți vecinii «v» ai lui «u»)
+          if (!vizitat[v])
+            tata[v] ← u
+            pasu[v] ← pasu[u] + 1
+            mini[v] ← pasu[v]
+            vizitat[v] ← true
+            găsit ← true         // am găsit un vecin nevizitat
+            S ← u
+            u ← v                // pasul de continuare a buclei «while»
+            break                // întrerupe bucla «for»
+          else                   // muchie de întoarcere
+            if ((tata[v] ≠ u) && (pasu[u] > pasu[v]))
+              if (mini[u] > pasu[v])
+                mini[u] ← pasu[v]
+                // actualizare valoare mini[] pentru părinți/strămoși
+                for (k ← tata[u]; mini[k] < mini[u]; k ← tata[k])
+                  mini[k] ← mini[u]
+          sfârșit «if»
+        sfârșit «for»
+      sfârșit «while»
+
+      // II: a doua parcurgere afișează muchiile critice
+      for i ← 1,n do
+        vizitat[i] ← false
+      sfârșit «for»
+      vizitat[u] ← true
+
+      S ← nod                    // adaugă nod în stivă
+      găsit ← false
+      while (S ≠ ∅)              // parcurg toate nodurile
+        if (!găsit)
+          u ← S                  // extrage nod din stivă
+
+        găsit ← false
+        // caută primul vecin nevizitat al nodului «u» (dacă există)
+        for (toți vecinii «v» ai lui «u»)
+          if (!vizitat[v])
+            if (pasu[u] < mini[v])
+              Output { "Muchia [u,v] este critică" }
+            vizitat[v] ← true
+            găsit ← true         // am găsit un vecin nevizitat
+            if («v» nu este ultimul vecin al nodului «u»)
+              S ← u
+            u ← v                // pasul de continuare a buclei «while»
             break                // întrerupe bucla «for»
         sfârșit «for»
       sfârșit «while»
@@ -289,3 +386,18 @@ Parcurgerea se termină în momentul în care stiva este vidă.
           vizitat[k] ← true;     // POST
       sfârșit «while»
     sfârșit procedură
+
+
+Arbori binari de căutare
+------------------------
+
+Un **arbore binar de căutare** este un arbore binar în care orice vârf «i» are proprietatea:
+
+* `inf[i] ≥ inf[j]` pentru toate vârfurile «j» ce aparțin subarborelui binar stâng
+
+* `inf[i] ≤ inf[j]` pentru toate vârfurile «j» ce aparțin subarborelui binar drept
+
+Am notat cu `inf[i]` informația asociată vârfului «i» — un tip de date peste care avem o relație de ordine.
+
+Prin parcurgerea înordine a unui arbore binar de căutare se obțin elementele vectorului «inf[i]» în ordine crescătoare.
+Operațiile de *creare* a arborelui, *ștergere*, *modificare* sau *inserare* a unui nod se mod face într-un mod optim astfel încât să fie păstrată proprietatea de *arbore de căutare*.
