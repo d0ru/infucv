@@ -11,8 +11,8 @@
 (cons '(/ (* 3.29 9) 5) '((sqrt (19)) (/ 13 2)))
 ;((/ (* 3.29 9) 5) (SQRT (19)) (/ 13 2))
 
-;(cons (/ (* 3.29 9) 5) '((sqrt (19)) (/ 13 2)))
-(5.922 (SQRT (19)) (/ 13 2))
+(cons (/ (* 3.29 9) 5) '((sqrt (19)) (/ 13 2)))
+;(5.922 (SQRT (19)) (/ 13 2))
 
 (cons (/ 13 2) '())
 ;(13/2)
@@ -23,6 +23,13 @@
 (cons (/ (* 3.29 9) 5)
   (cons (sqrt 19)
     (cons (/ 13 2) '())
+  )
+)
+;(5.922 4.358899 13/2)
+
+(cons (/ (* 3.29 9) 5)
+  (cons (sqrt 19)
+    (list (/ 13 2))
   )
 )
 ;(5.922 4.358899 13/2)
@@ -43,14 +50,14 @@
 ;; 4) Să se colecteze primele 3 elemente ale unei liste și să se construiască o nouă listă formată din acestea.
 (cons (first '(6 5 2 4 5))
   (cons (second '(6 5 2 4 5))
-    (cons (third '(6 5 2 4 5)) '())
+    (list (third '(6 5 2 4 5)))
   )
 )
 ;(6 5 2)
 
 ;; 5) Să se construiască o listă cu suma și produsul primelor 2 elemente dintr-o listă dată.
 (cons (+ (first '(6 5 2 4 5)) (second '(6 5 2 4 5)))
-  (cons (* (first '(6 5 2 4 5)) (second '(6 5 2 4 5))) '())
+  (list (* (first '(6 5 2 4 5)) (second '(6 5 2 4 5))))
 )
 ;(11 30)
 
@@ -65,18 +72,18 @@
 
 
 ;; 7) Să se inverseze o listă dată de 3 elemente.
-(cons (third '( 4 6 8))
-  (cons (second '( 4 6 8))
-    (cons (first '( 4 6 8)) '())
+(cons (third '(4 6 8))
+  (cons (second '(4 6 8))
+    (list (first '(4 6 8)))
   )
 )
 ;(8 6 4)
 
 
 ;; 8) Să se calculeze produsul primelor 3 numere dintr-o listă și să se ridice la pătrat.
-(* (first '( 4 6 8)) (second '( 4 6 8)) (third '( 4 6 8)))
+(* (first '(4 6 8)) (second '(4 6 8)) (third '(4 6 8)))
 ;192
-(expt (* (first '( 4 6 8)) (second '( 4 6 8)) (third '( 4 6 8))) 2)
+(expt (* (first '(4 6 8)) (second '(4 6 8)) (third '(4 6 8))) 2)
 ;36864
 
 
