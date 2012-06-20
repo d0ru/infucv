@@ -475,14 +475,16 @@ Algoritmii de căutare a arborelui de acoperire de cost minim face abstracție d
 
 ### Algoritmul lui Prim
 
-Se pornește cu o mulțime formată dintr-un singur nod. La fiecare pas se alege muchia de cost minim cu o sigură extremitate în mulțimea S. Procesul se încheie după `n - 1` pași.
-Sunt utilizați trei vectori de dimeniune `n = |V|`:
+Se pornește cu o mulțime formată dintr-un singur nod. La fiecare pas se alege muchia de cost minim cu o sigură extremitate în mulțimea virtuală M.
+Procesul se încheie după `n - 1` pași. Sunt utilizați trei vectori de dimeniune `n = |V|`:
 
 * `vizitat[]`
 
-* `dist[]` va conține distanța minimă de la nodul `v ∉ M` la un nod `u ∈ M` (inițial egal cu cost[nod,v])
+* `dist[]` va conține distanța minimă de la nodul `v ∉ M` la un nod `u ∈ M` (inițial egal cu `cost[nod,v]`)
 
 * `tata[]` va conține pentru fiecare nod `v ∉ M` nodul `u ∈ M` a.î. `cost[u,v] = minim {cost[k,v] | ∀k ∈ M}`
+
+Algoritmul lui Prim implementat simplu are o complexitate O(N²), implementat cu *heap*-uri Fibonacii (sau *pairing heaps*) are o complexitate O(M•lgN).
 
     procedura ARBORE_COST_MINIM_PRIM2(graf, nr, nod, L)
       INTRARE: graf — graful conex neorientat
@@ -512,8 +514,6 @@ Sunt utilizați trei vectori de dimeniune `n = |V|`:
         sfârșit «for»
       sfârșit «for»
     sfârșit procedură
-
-Algoritmul lui Prim implementat simplu are o complexitate O(N²), implementat cu *heap*-uri Fibonacii (sau *pairing heaps*) are o complexitate O(M•lgN).
 
 ### Algoritmul lui Kruskal
 
@@ -546,3 +546,59 @@ La fiecare pas numărul arborilor parțiali scade cu 1. Procesul se încheie dup
     sfârșit procedură
 
 O implementare mai detaliată construiește matricea muchiilor formată din 3 coloane, ultima reprezentând costul muchiei asociate. Această matrice este ordonată crescător după cea de-a treia coloană (cost).
+
+
+Grafuri orientate
+-----------------
+
+Se numește **graf orientat** o pereche ordonată G = (V,E), unde V este o mulțime de vârfuri sau noduri, iar E este o mulțime de arce.
+
+Noțiunea de *muchie* este înlocuită cu noțiunea de *arc*. O pereche de noduri (x,y) este ordonată, adică `(x,y) ≠ (y,x)`. Se mai spune că vârfurile x și y sunt adiacente.
+
+**Gradul exterior** al unui vârf (eng. "degree") notat d+(x) este egal cu numărul arcelor care pornesc din «x».
+**Gradul interior** al unui vârf notat d-(x) este egal cu numărul arcelor cu săgeata pe «x».
+
+Un **lanț** L=[l1,..lm] este o succesiune de *arce* cu proprietatea că oricare două arce consecutive ale secvenței au o extremitate comună.
+
+Un **drum** (eng. "path") D=[v0,v1,..vm] este o [succesiune de *vârfuri*][path] cu proprietatea că oricare două vârfuri consecutive ale secvenței formează un arc.
+Dacă vârfurile v0,v1,..vm sunt distincte două câte două, drumul se numește **elementar**.
+
+[path]: http://en.wikipedia.org/wiki/Path_(graph_theory)
+
+Un **ciclu** este un [drum care se încheie][cycle] (v0=vm).
+Pentru a sublinia diferența față de grafurile neorientate, un ciclu al unui graf orientat se mai numește **circuit**.
+
+[cycle]: http://en.wikipedia.org/wiki/Cycle_(graph_theory)
+
+Un graf este **conex** dacă pentru orice pereche de vârfuri *x* și *y* există un *lanț*.
+Un graf este **tare conex** dacă între orice pereche de vârfuri *x* și *y* există un *drum*.
+
+### Parcurgerea grafurilor
+
+Pentru fiecare nod *v* vom introduce două numere: prenum[v], postnum[v].
+
+* `prenum[v]` — momentul pentru care este întâlnit nodul *v* pentru prima oară
+
+* `postnum[v]` — momentul în care prelucrarea nodului *v* s-a încheiat
+
+La parcurgerea unui graf orientat avem următoarele tipuri de arce:
+
+* arc al arborelui de acoperire
+
+        prenum[u] < prenum[v]
+        postnum[u] > postnum[v]
+
+* arc de înaintare (u,v) — dacă este paralel cu un drum de la *u* la *v* din arborele de acoperire
+
+        prenum[u] < prenum[v]
+        postnum[u] > postnum[v]
+
+* arc de întoarcere — arcul (u,v) are sens contrar unui drum de la *v* la *u* din arborele de acoperire
+
+        prenum[u] > prenum[v]
+        postnum[u] < postnum[v]
+
+* arc de traversare (u,v) — dacă *v* nu este descendent direct, nici strămoș al lui *u*
+
+        prenum[u] > prenum[v]
+        postnum[u] > postnum[v]
