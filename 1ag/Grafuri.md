@@ -22,13 +22,19 @@ S=(Vp,Ep) se numește **subgraf** al lui G=(V,E) dacă `Vp ⊆ V` iar muchiile d
 
 **Gradul** unui vârf (eng. "degree") notat d(x) este egal cu numărul muchiilor incidente cu vârful «x». Un vârf cu gradul 0 se numește **vârf izolat**.
 
-Propoziție: `∑d(xk) = 2·|E|, k=1..n` pentru orice graf.
+_Propoziție:_ `∑d(xk) = 2·|E|, k=1..n` pentru orice graf.
+
+_Corolar:_ în orice graf există un număr par de vârfuri de grad impar.
 
 Se numește **secvență grafică** un șir de numere naturale d1,d2,..dn cu proprietatea că ele reprezintă gradele vârfurilor unui graf neorientat.
 
-Un **lanț** L=[v0,v1,..vm] este o succesiune de vârfuri adiacente, iar «m» este **lungimea** lanțului. Dacă vârfurile v0,v1,..vm sunt distincte două câte două, lanțul se numește **elementar**.
+Un **lanț** L=[v0,v1,..vm] este o succesiune de vârfuri adiacente, iar «m» este **lungimea** lanțului.
+Dacă vârfurile v0,v1,..vm sunt distincte două câte două, lanțul se numește **elementar**.
+Dacă toate muchiile sunt distincte două câte două, lanțul se numește **simplu**.
 
-**Ciclul** este un lanț care se încheie (v0=vm).
+În literatura grafurilor se întâlnesc noțiunile echivalente: _cale_, _drum_, _parcurs_.
+
+Un **ciclu** este un lanț care se închide (v0=vm).
 
 Un **graf conex** este un graf fără componente izolate, adică între oricare două vârfuri există un lanț.
 
@@ -50,7 +56,7 @@ Valorile matricii se definesc astfel:
 3) *Liste de adiacență* — sau liste de vecini, pentru fiecare nod se construiește lista nodurilor adiacente.
 Pentru un graf neorientat numărul elementelor din listele de vecini este `2 × |E|` deoarece orice muchie [u,v] va fi prezentă atât în lista nodului «u» cât și cea a nodului «v».
 
-Aceste liste de adiacență pot fi implementate prin vectori (CAP+LISTA), liste simple sau dublu înlănțuite.
+Aceste liste de adiacență pot fi implementate prin vectori (cap-listă), liste simple sau dublu înlănțuite.
 
 4) *Lista de muchii* — sau matricea de muchii — într-o matrice `2 x |E|` sunt reținute toate muchiile [u,v], pe prima linie este «u» iar pe a doua linie este «v».
 
@@ -147,9 +153,9 @@ Algoritmul de parcurgere în adâncime face abstracție de forma de reprezentare
 
 O muchie este **critică** dacă prin eliminarea ei va crește numărul de componente conexe ale grafului.
 
-Proprietate: o muchie nu este critică dacă face parte din cel puțin un ciclu elementar al grafului.
+_Proprietate:_ o muchie nu este critică dacă face parte din cel puțin un ciclu elementar al grafului.
 
-Muchiile unui graf sunt clasificate în două categorii:
+La parcurgerea în adâncime a unui graf, muchiile sunt clasificate în două categorii:
 
 * muchie a arborelui de acoperire
 
@@ -240,40 +246,46 @@ Algoritmul de căutare a muchiilor critice face abstracție de forma de reprezen
 Grafuri euleriene
 -----------------
 
-**Lanț eulerian** este un lanț ce nu se repetă (conține fiecare muchie o singură dată). Dacă în plus `v0=vm` avem un **ciclu eulerian** ↦ **graf eulerian**.
+**Lanț eulerian** este un lanț simplu ce [conține toate muchiile grafului][eulerian].
 
-Teoremă: un graf conex este un **graf eulerian** dacă și numai dacă gradul fiecărui vârf este **par**.
+[eulerian]: http://en.wikipedia.org/wiki/Eulerian_path
 
-Teoremă: un graf conex G are un **lanț eulerian** dacă și numai dacă există exact **două** vârfuri în G al căror grad să fie **impar**.
+**Ciclu eulerian** este un ciclu simplu (v0=vm) ce conține toate muchiile grafului ↦ **graf eulerian**.
 
-Corolar: un graf conex este **eulerian** dacă și numai dacă mulțimea muchiilor sale poate fi descompusă în cicluri disjuncte.
+_Teoremă:_ un graf conex este **eulerian** dacă și numai dacă gradul fiecărui vârf este **par**.
 
-Teoremă: un graf conex G=(V,E) cu «2k» vârfuri de grad impar (k ≥ 1) are «k» lanțuri ale căror mulțimi de muchii formează o partiție a lui E, din care cel mult unul are lungime impară.
+_Teoremă:_ un graf conex G are un **lanț eulerian** dacă și numai dacă există exact **două** vârfuri în G al căror grad să fie **impar**.
+
+_Corolar:_ un graf conex este **eulerian** dacă și numai dacă mulțimea muchiilor sale poate fi descompusă în cicluri disjuncte.
+
+_Teoremă:_ un graf conex G=(V,E) cu «2k» vârfuri de grad impar `k ≥ 1` are «k» lanțuri ale căror mulțimi de muchii formează o partiție a lui E, din care cel mult unul are lungime impară.
 
 
 Grafuri hamiltoniene
 --------------------
 
-**Lanț hamiltonian** este un lanț ce trece o singură dată prin toate vârfurile unui graf.
+**Lanț hamiltonian** este un lanț elementar ce [trece prin toate vârfurile grafului][hamiltonian].
+
+[hamiltonian]: http://en.wikipedia.org/wiki/Hamiltonian_path
 
 **Ciclu hamiltonian** este un ciclu elementar (v0=vm) ce trece prin toate vârfurile grafului ↦ **graf hamiltonian**.
 
     δ(G) = min {d(u) | u ∈ V}
     Δ(G) = max {d(u) | u ∈ V}
 
-Lemă: fie G=(V,E) un graf neorientat și fie «u» și «v» două vârfuri neadiacente a.î. `d(u)+d(v) ≥ n`. Atunci G este hamiltonian ⇔ G+[u,v] este hamiltonian.
+_Lemă:_ fie G=(V,E) un graf neorientat și fie «u» și «v» două vârfuri neadiacente a.î. `d(u)+d(v) ≥ n`. Atunci G este hamiltonian ⇔ G+[u,v] este hamiltonian.
 
-Teoremă: un graf G=(V,E) este hamiltonian dacă `δ(G) ≥ n/2`.
+_Teoremă:_ un graf G=(V,E) este hamiltonian dacă `δ(G) ≥ n/2`.
 
-Teoremă: un graf G=(V,E) este hamiltonian dacă ∀u,v ∈ V distincte și neadiacente avem `d(u)+d(v) ≥ n`.
+_Teoremă:_ un graf G=(V,E) este hamiltonian dacă ∀u,v ∈ V distincte și neadiacente avem `d(u)+d(v) ≥ n`.
 
-Teoremă: fie G=(V,E) un graf neorientat și d1,d2..dn o secvență grafică. Dacă `∀k a.î. dk ≤ k ≤ n/2 ⇒ d[n-k] ≥ n-k` atunci graful este hamiltonian.
+_Teoremă:_ fie G=(V,E) un graf neorientat și d1,d2..dn o secvență grafică. Dacă `∀k a.î. dk ≤ k ≤ n/2 ⇒ d[n-k] ≥ n-k` atunci graful este hamiltonian.
 
 **Închiderea lui G** notată cu `cl(G)` este un graf construit prin adăugarea tuturor muchiilor `(u,v)`, ∀u,v ∈ V distincte și neadiacente a.î. `d(u)+d(v) ≥ n`.
 
-Lemă: orice graf are o singură închidere.
+_Lemă:_ orice graf are o singură închidere.
 
-Corolar: un graf G=(V,E) este hamiltonian dacă `cl(G) ≅ Kn` (închiderea lui G este izomorfă cu graful complet de ordinul «n»).
+_Corolar:_ un graf G=(V,E) este hamiltonian dacă `cl(G) ≅ Kn` (închiderea lui G este izomorfă cu graful complet de ordinul «n»).
 
 O mulțime de vârfuri A este **independentă** dacă oricare două elemente distincte din A sunt independente. Numărul de independență a lui G notat `β(G) = |I|`, unde I este o mulțime independentă pe G cu cel mai mare număr de vârfuri.
 
@@ -281,7 +293,7 @@ O mulțime de vârfuri A este **independentă** dacă oricare două elemente dis
 
 O **tăietură** este o submulțime U a lui V a.î. G-U să fie neconex. Conectivitatea lui G notată `κ(G)` reprezintă numărul minim de puncte ale unei tăieturi.
 
-Teoremă: un graf G=(V,E) cu ordinul `n ≥ 3` este hamiltonian dacă `κ(G) ≥ β(G)`.
+_Teoremă:_ un graf G=(V,E) cu ordinul `n ≥ 3` este hamiltonian dacă `κ(G) ≥ β(G)`.
 
 
 Arbori binari
@@ -341,15 +353,15 @@ Exemplu: (1 ((2 (3 (0, 4))), (5 (6, 7))), (8 (0,9)))).
 
 În toate metodele este parcurs mai întâi subarborele stâng și apoi subarborele drept.
 
-* parcurgere în **preordine**: rădăcină, subarbore stâng, subarbore drept.
+* parcurgere în **preordine**: rădăcină, subarbore stâng, subarbore drept
 
 Exemplu: 1 2 3 4 5 6 7 8 9
 
-* parcurgere în **inordine**: subarbore stâng, rădăcină, subarbore drept.
+* parcurgere în **inordine**: subarbore stâng, rădăcină, subarbore drept
 
 Exemplu: 3 4 2 6 5 7 1 8 9
 
-* parcurgere în **postordine**: subarbore stâng, subarbore drept, rădăcină.
+* parcurgere în **postordine**: subarbore stâng, subarbore drept, rădăcină
 
 Exemplu: 4 3 6 7 5 2 9 8 1
 
@@ -390,8 +402,7 @@ Parcurgerea se termină în momentul în care stiva este vidă.
     sfârșit procedură
 
 
-Arbori binari de căutare
-------------------------
+### Arbori binari de căutare
 
 Un **arbore binar de căutare** este un arbore binar în care orice vârf «i» are proprietatea:
 
@@ -403,3 +414,135 @@ Am notat cu `inf[i]` informația asociată vârfului «i» — un tip de date pe
 
 Prin parcurgerea înordine a unui arbore binar de căutare se obțin elementele vectorului «inf[i]» în ordine crescătoare.
 Operațiile de *creare* a arborelui, *ștergere*, *modificare* sau *inserare* a unui nod se mod face într-un mod optim astfel încât să fie păstrată proprietatea de *arbore de căutare*.
+
+
+Arbori oarecare
+---------------
+
+Numim **arbore** o mulțime finită de noduri astfel încât:
+
+1) există un nod special numit rădăcina arborelui
+
+2) celelalte noduri sunt repartizate în «n» mulțimi disjuncte două câte două `A1,A2..An`, fiecare mulțime `Ai` constituind la rândul ei un arbore.
+
+### Moduri de reprezentare
+
+Un exemplu de arbore oarecare:
+
+             (1)
+           /  |   \
+        (2)  (3)    (.....4.....)
+             / \    /   /   \   \
+           (5) (6) (7) (8) (9) (10)
+
+1) legături fiu-frate: `fiu[k]` este primul descendent al nodului «k», `frate[fiu[k]]` este următorul descendent al tatălui nodului «k».
+
+      nod | 1 2 3 4 5 6 7 8 9 10
+    ------|---------------------
+      fiu | 2 0 5 7 0 0 0 0 0  0
+    frate | 0 3 4 0 6 0 8 9 10 0
+
+2) lista descendenților (sau cap-listă)
+
+      nod | 1 2 3 4 5 6 7 8 9 10
+    ------|---------------------
+      cap | 1 0 4 6 0 0 0 0 0  0
+
+       (2 3 4 5 6 7 8 9  10)
+       (2 3 0 5 0 7 8 10  0)
+
+3) reprezentarea de tip tată
+
+     nod | 1 2 3 4 5 6 7 8 9 10
+    -----|---------------------
+    tată | 0 1 1 1 3 3 4 4 4  4
+
+### Metode de parcurgere
+
+* parcurgere în **apreordine**: rădăcină, subarbori
+
+Exemplu: 1  2  3 5 6  4 7 8 9 10
+
+* parcurgere în **apostordine**: subarbori, rădăcină
+
+Exemplu: 2  5 6 3  7 8 9 10 4  1
+
+### Arbori de acoperire de cost minim
+
+Fie `G=(V,E)` un graf neorientat. Se cere să se determine un *graf parțial connex* `Gc=(V,Ep)` cu `Ep ⊆ E` cu proprietatea că suma costurilor tuturor muchiilor este minimă. Graful parțial de cost minim este un arbore, de aceea se mai numește *arbore parțial de cost minim*.
+
+Algoritmii de căutare a arborelui de acoperire de cost minim face abstracție de forma de reprezentare a grafului neorientat.
+
+### Algoritmul lui Prim
+
+Se pornește cu o mulțime formată dintr-un singur nod. La fiecare pas se alege muchia de cost minim cu o sigură extremitate în mulțimea S. Procesul se încheie după `n - 1` pași.
+Sunt utilizați trei vectori de dimeniune `n = |V|`:
+
+* `vizitat[]`
+
+* `dist[]` va conține distanța minimă de la nodul `v ∉ M` la un nod `u ∈ M` (inițial egal cu cost[nod,v])
+
+* `tata[]` va conține pentru fiecare nod `v ∉ M` nodul `u ∈ M` a.î. `cost[u,v] = minim {cost[k,v] | ∀k ∈ M}`
+
+    procedura ARBORE_COST_MINIM_PRIM2(graf, nr, nod, L)
+      INTRARE: graf — graful conex neorientat
+               nr — numărul de vârfuri sau
+                  — numărul de muchii (pentru reprezentarea MM)
+               nod — vârful de pornire
+
+      for k ← 1,n do
+        vizitat[k] ← false             // M ← ∅
+        dist[k] ← cost[nod,k]          // vectorul distanțelor
+        tata[k] ← nod
+      sfârșit «for»
+      vizitat[nod] ← true              // M ← { nod }
+      L ← ∅                            // mulțimea muchiilor ce formează arborele de cost minim
+
+      for i ← 1,nr-1 do
+        u ← minim {dist[u] | u ∈ V\M}
+        vizitat[u] ← true              // M ← M ∪ {u}
+        L ← (tata[u],u)                // muchie adăugată în listă
+
+        // actualizare distanțe după introducerea nodului «u» în arbore
+        for (toți vecinii «v» ai lui «u», v ∈ V\M)
+          if (!vizitat[v] && dist[v] > cost[u,v])
+            dist[v] ← cost[u,v]
+            tata[v] ← u
+          sfârșit «if»
+        sfârșit «for»
+      sfârșit «for»
+    sfârșit procedură
+
+Algoritmul lui Prim implementat simplu are o complexitate O(N²), implementat cu *heap*-uri Fibonacii (sau *pairing heaps*) are o complexitate O(M•lgN).
+
+### Algoritmul lui Kruskal
+
+Se pornește cu o pădure de arbori, fiecare arbore fiind având un singur nod.
+La fiecare pas se alege o muchie de cost minim. Se verifică dacă extremitățile fac parte din arbori diferiți, în caz afirmativ muchia este selectată și cei doi arbori parțiali sunt uniți.
+
+La fiecare pas numărul arborilor parțiali scade cu 1. Procesul se încheie după `n - 1` pași.
+
+    procedura ARBORE_COST_MINIM_KRUSKAL2(graf, nr, nod, L)
+      INTRARE: graf — graful conex neorientat
+               nr — numărul de vârfuri sau
+                  — numărul de muchii (pentru reprezentarea MM)
+               nod — vârful de pornire
+
+      for k ← 1,n do
+        inițializare_arbore(k)
+      sfârșit «for»
+      cost ← 0                         // costul total
+      L ← ∅                            // mulțimea muchiilor ce formează arborele de cost minim
+
+      sortează crescător muchiile în funcție de cost
+      for i ← 1,nr-1 do
+        selectează următoarea muchie (u,v) de cost minim
+        if (nodurile u,v NU sunt în același arbore parțial)
+          cost ← cost + cost[u,v]
+          L ← L ∪ {(u,v)}              // muchie adăugată în listă
+          unește arborii ce conțin nodurile «u» și «v»
+        sfârșit «if»
+      sfârșit «for»
+    sfârșit procedură
+
+O implementare mai detaliată construiește matricea muchiilor formată din 3 coloane, ultima reprezentând costul muchiei asociate. Această matrice este ordonată crescător după cea de-a treia coloană (cost).
