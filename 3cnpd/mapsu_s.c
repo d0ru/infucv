@@ -2,18 +2,14 @@
  * mapsu_s.c -- server pentru clienții f1(), f2() și f3()
  * Metoda aproximațiilor succesive pentru sisteme de ecuații.
  *
- * x = lg(y/z) + 1
- * y = -2•x² + z² + 0.4
- * z = x•y/20 + 2
+ * / x = lg(y/z) + 1
+ * | y = -2•x² + z² + 0.4
+ * \ z = x•y/20 + 2
+ *
  * x0 = [1 2 2]
  * eps = 0.00000000000001
  *
- * x[1] = 1.0879816609726
- * x[2] = 2.6239220287035
- * x[3] = 2.1427389523526
- * Numarul de iteratii efectuate este n = 62
- *
- * În 61 iterații soluția aproximată calculată este:
+ * În 62 iterații soluția aproximată calculată este:
  * x[1] = 1.08798166097262916096610752
  * x[2] = 2.62392202870348079102313932
  * x[3] = 2.14273895235257416658214424
@@ -30,13 +26,16 @@
 // memset()
 #include <string.h>
 
-// getaddrinfo(), socket()
+// accept()
 #include <sys/types.h>
-#include <sys/socket.h>
-#include <netdb.h>
 
-// close()
-#include <unistd.h>
+#if ((defined _WIN32 || defined __WIN32__) && !defined __CYGWIN__)
+#  define _WIN32_WINNT	0x501
+#  include <winsock2.h>
+#  include <ws2tcpip.h>
+#else
+#  include <sys/socket.h>
+#endif
 
 #include "libmapsu.c"
 
@@ -45,8 +44,7 @@
 #define PORT_CF2	"60002"		// portul de comunicare cu f2()
 #define PORT_CF3	"60003"		// portul de comunicare cu f3()
 
-
-// sock mapsu_cf1()
+// soclu mapsu_cf1
 double f1(int fd, double x, double y, double z)
 {
 	char buf[BUF_SIZE];
@@ -77,7 +75,7 @@ double f1(int fd, double x, double y, double z)
 	exit(EXIT_FAILURE);
 }
 
-// sock mapsu_cf2()
+// soclu mapsu_cf2
 double f2(int fd, double x, double y, double z)
 {
 	char buf[BUF_SIZE];
@@ -108,7 +106,7 @@ double f2(int fd, double x, double y, double z)
 	exit(EXIT_FAILURE);
 }
 
-// sock mapsu_cf3()
+// soclu mapsu_cf3
 double f3(int fd, double x, double y, double z)
 {
 	char buf[BUF_SIZE];
@@ -140,7 +138,7 @@ double f3(int fd, double x, double y, double z)
 }
 
 
-// mapsu_server
+// mapsu server
 int main(int argc, char *argv[])
 {
 	int s1fd, s2fd, s3fd;
@@ -149,7 +147,7 @@ int main(int argc, char *argv[])
 	socklen_t peer_addr1_len, peer_addr2_len, peer_addr3_len;
 
 	double x[4] = {0, 1, 2, 2};
-	double eps = 0.00000000000001;		// 0.00000000000001;
+	double eps = 0.00000000000001;
 	double max2;
 	int n, ITMAX = 200;
 
@@ -169,11 +167,11 @@ int main(int argc, char *argv[])
 	c2fd = accept(s2fd, (struct sockaddr *)&peer_addr2, &peer_addr2_len);
 	c3fd = accept(s3fd, (struct sockaddr *)&peer_addr3, &peer_addr3_len);
 	if (-1 == c1fd || -1 == c2fd || -1 == c3fd) {
-		perror("accept: ");
+		perror("mapsu_s: accept: ");
 		exit(EXIT_FAILURE);
 	}
 
-	for (n = 0; n <= ITMAX; ++n) {
+	for (n = 1; n <= ITMAX; ++n) {
 		x[1] = f1(c1fd, x[1], x[2], x[3]);
 		x[2] = f2(c2fd, x[1], x[2], x[3]);
 		x[3] = f3(c3fd, x[1], x[2], x[3]);
@@ -199,9 +197,5 @@ int main(int argc, char *argv[])
 		printf ("soluția aproximată calculată este:\n");
 	for(n = 1; n <= 3; n++)
 		printf ("  x[%d] = %.26lf\n", n, x[n]);
-
-	close(s1fd);
-	close(s2fd);
-	close(s3fd);
 	return 0;
 }

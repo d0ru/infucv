@@ -6,14 +6,19 @@
 //#define NDEBUG
 
 #include <assert.h>
+#include <stdlib.h>
 #include <stdio.h>
 
 // recv(), send()
 #include <sys/types.h>
-#include <sys/socket.h>
 
-// close()
-#include <unistd.h>
+#if ((defined _WIN32 || defined __WIN32__) && !defined __CYGWIN__)
+#  define _WIN32_WINNT	0x501
+#  include <winsock2.h>
+#  include <ws2tcpip.h>
+#else
+#  include <sys/socket.h>
+#endif
 
 // log10()
 #include <math.h>
@@ -88,6 +93,5 @@ int main(int argc, char *argv[])
 #endif
 		}
 	}
-	close(sfd);
 	return 0;
 }

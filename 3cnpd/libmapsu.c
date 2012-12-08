@@ -3,11 +3,6 @@
  * Metoda aproximațiilor succesive pentru sisteme de ecuații.
  */
 
-//#define NDEBUG
-
-#include <assert.h>
-#include <errno.h>
-#include <stdlib.h>
 #include <stdio.h>
 
 // memset()
@@ -15,14 +10,20 @@
 
 // getaddrinfo(), socket()
 #include <sys/types.h>
-#include <sys/socket.h>
-#include <netdb.h>
+
+#if ((defined _WIN32 || defined __WIN32__) && !defined __CYGWIN__)
+#  define _WIN32_WINNT	0x501
+#  include <winsock2.h>
+#  include <ws2tcpip.h>
+#else
+#  include <sys/socket.h>
+#  include <netdb.h>
+#endif
 
 // close()
 #include <unistd.h>
 
 #define BACKLOG		20		// how many pending connections queue will hold
-
 
 // crează un server TCP care ascultă cereri pe *:lport
 int mkserv(const char *lport)
@@ -30,6 +31,16 @@ int mkserv(const char *lport)
 	struct addrinfo hints;
 	struct addrinfo *result, *pr;
 	int sfd, e;
+
+#if ((defined _WIN32 || defined __WIN32__) && !defined __CYGWIN__)
+	WSADATA wsaData;
+	e = WSAStartup(MAKEWORD(2,2), &wsaData);
+	if (0 != e) {
+		fprintf(stderr, "WSAStartup: %s\n", gai_strerror(e));
+		WSACleanup();
+		return -1;
+	}
+#endif
 
 	// parametrii structură adrese
 	memset(&hints, 0, sizeof(struct addrinfo));
@@ -59,7 +70,11 @@ int mkserv(const char *lport)
 			break;		/* Success */
 		}
 
+#if ((defined _WIN32 || defined __WIN32__) && !defined __CYGWIN__)
+		closesocket(sfd);
+#else
 		close(sfd);
+#endif
 	}
 	freeaddrinfo(result);		/* No longer needed */
 	return (NULL == pr) ? -1 : sfd;
@@ -71,6 +86,16 @@ int mkconn(char *shost, char *sport)
 	struct addrinfo hints;
 	struct addrinfo *result, *pr;
 	int sfd, e;
+
+#if ((defined _WIN32 || defined __WIN32__) && !defined __CYGWIN__)
+	WSADATA wsaData;
+	e = WSAStartup(MAKEWORD(2,2), &wsaData);
+	if (0 != e) {
+		fprintf(stderr, "WSAStartup: %s\n", gai_strerror(e));
+		WSACleanup();
+		return -1;
+	}
+#endif
 
 	// parametrii structură adrese
 	memset(&hints, 0, sizeof(struct addrinfo));
@@ -95,7 +120,11 @@ int mkconn(char *shost, char *sport)
 		if (connect(sfd, pr->ai_addr, pr->ai_addrlen) != -1)
 			break;		/* Success */
 
+#if ((defined _WIN32 || defined __WIN32__) && !defined __CYGWIN__)
+		closesocket(sfd);
+#else
 		close(sfd);
+#endif
 	}
 	freeaddrinfo(result);		/* No longer needed */
 	return (NULL == pr) ? -1 : sfd;
