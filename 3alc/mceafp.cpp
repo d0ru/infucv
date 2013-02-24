@@ -7,11 +7,13 @@
  */
 
 #define NDEBUG
+#define NINFO
 
 #include <errno.h>
 #include <stdbool.h>
 #include <stdio.h>
 //#include <stdlib.h>
+#include <ctype.h>
 
 #include <stack>
 #include <string>
@@ -31,8 +33,6 @@ double yylval;			// operandul din stânga
 void yyerror(char const *mesaj);
 int yylex(void);		// analiza lexicală ↦ atom
 int yyexfp(void);		// expresie ↦ forma postfixată
-int yyparse(void);		// analiza sintactică
-int cmpop(int op1, int op2);
 
 
 // mini compilator expresii aritmetice simple
@@ -59,49 +59,25 @@ int main(int argc, char *argv[])
 				printf("%d:%s\n\n", nrlin, sirexp.c_str());
 		} else
 			fputc('\n', stdout);
-		//yyparse();
 	};
 	return 0;
 }
 
 
-// compară prioritățile operatorilor
-int cmpop(int op1, int op2)
+// prioritate operator
+int prop(int op)
 {
-#ifndef NDEBUG
-	printf("~ compar %c cu %c\n", (char)op1, (char)op2);
-#endif
-	switch (op1) {
-	case '$':
+	switch (op) {
 	case '(':
+		return 1;
 	case ')':
-		// prioritatea cea mai mică (0 ≤ 0|1|2)
-		return 0;
+		return 2;
 	case '+':
 	case '-':
-		// prioritatea medie (0 < 1 < 2)
-		switch (op2) {
-		case '$':
-		case '(':
-		case ')':
-			// prioritate mai mare (1 > 0)
-			return 1;
-		default:
-			// aceeași prioritate sau mai mică (1 ≤ 1|2)
-			return 0;
-		}
+		return 3;
 	case '*':
 	case '/':
-		// prioritatea cea mai mare (2 ≥ 0|1|2)
-		switch (op2) {
-		case '*':
-		case '/':
-			// aceeași prioritate (2 = 2)
-			return 0;
-		default:
-			// prioritate mai mare (2 > 0|1)
-			return 1;
-		}
+		return 4;
 	}
 	return 0;		// pentru siguranță
 }
@@ -116,8 +92,7 @@ void yyerror(char const *mesaj)
 
 /* Analizorul lexical returnează 0 la citire operand (salvează numărul în
  * variabila globală yylval), sau codul numeric al caracterului citit.
- * Două excepții importante:
- * - returnează $ la sfârșit de linie pentru a semnala sfârșitul expresiei;
+ * Excepție importantă:
  * - returnează EOF când se ajunge la sfârșitul fișierului de intrare.
  */
 int yylex(void)
@@ -128,18 +103,13 @@ int yylex(void)
 	do {
 		c = fgetc(fisier);
 		++nrcol;
-	} while (c == ' ' || c == '\t');
-
-	// sfârșit expresie aritmetică
-	if ('\n' == c)
-		return '$';
+	} while (isblank(c));
 
 	// sfârșit fișier de intrare
 	if (EOF == c)
 		return EOF;
 
 	// citește un număr pozitiv
-	//'+' == c || '-' == c ||
 	if ('.' == c || isdigit(c)) {
 		ungetc(c, fisier);
 		fscanf(fisier, "%lf", &yylval);
@@ -154,6 +124,8 @@ int yyexfp(void)
 {
 	char yylstr[200];
 	int op;				// operatorul citit (sau paranteză)
+	int ops;			// operatorul din vârful stivei
+	bool gasit;			// găsit pereche ()
 
 	nrcol = 0;
 	err = false;
@@ -172,7 +144,9 @@ int yyexfp(void)
 #endif
 			sprintf(yylstr, " %lg", yylval);
 			sirexp += yylstr;
+#ifndef NINFO
 			printf("::%s\n", sirexp.c_str());
+#endif
 			break;
 		case '(':
 #ifndef NDEBUG
@@ -184,59 +158,71 @@ int yyexfp(void)
 		case '-':
 		case '*':
 		case '/':
-			if (stiva.empty() || (cmpop(op,stiva.top()) > 0)) {
+			while (!stiva.empty()) {
+				ops = stiva.top();
 #ifndef NDEBUG
-				printf("~ adaug %c în stivă\n", (char)op);
+				printf("~ compar op%c cu ops%c\n", (char)op, (char)ops);
 #endif
-				stiva.push(op);
-			} else {
-				ungetc(op, fisier);	// banda de intrare
-				op = stiva.top();
+				if (prop(op) > prop(ops))
+					break;
 				stiva.pop();
 				sirexp += " ";
-				sirexp += op;		// banda de ieșire
+				sirexp += ops;		// banda de ieșire
 #ifndef NDEBUG
-				printf("~ mutat %c din stivă la expresia postfixată\n", (char)op);
+				printf("~ mutat %c din stivă la expresia postfixată\n", (char)ops);
 #endif
 			}
+#ifndef NDEBUG
+			printf("~ adaug %c în stivă\n", (char)op);
+#endif
+			stiva.push(op);
 			break;
 		case ')':
+			gasit = false;
 			while (!stiva.empty()) {
-				op = stiva.top();
+				ops = stiva.top();
 				stiva.pop();
-				if ('(' != op) {
-					sirexp += " ";
-					sirexp += op;	// banda de ieșire
+				if ('(' == ops) {
 #ifndef NDEBUG
-					printf("~ mutat %c din stivă la expresia postfixată\n", (char)op);
+					printf("~ eliminat pereche paranteze ()\n");
 #endif
-					continue;
+					gasit = true;
+					break;
+				} else {
+					sirexp += " ";
+					sirexp += ops;		// banda de ieșire
+#ifndef NDEBUG
+					printf("~ mutat %c din stivă la expresia postfixată\n", (char)ops);
+#endif
 				}
-				break;
 			}
-			if ('(' != op) {	// eroare sintactică
-				err = true;
+			if (!gasit) {
+				err = true;		// eroare sintactică
 				yyerror("')' fără pereche");
 			}
 			break;
 		case EOF:
-		case '$':
+		case '\n':
 			// am terminat de prelucrat banda de intrare
 			while (!stiva.empty()) {
-				op = stiva.top();
+				ops = stiva.top();
 				stiva.pop();
-				sirexp += " ";
-				sirexp += op;		// banda de ieșire
+				if ('(' == ops) {
+					err = true;		// eroare sintactică
+					yyerror("'(' fără pereche");
+				} else {
+					sirexp += " ";
+					sirexp += ops;		// banda de ieșire
 #ifndef NDEBUG
-				printf("~ mutat %c din stivă la expresia postfixată\n", (char)op);
+				printf("~ mutat %c din stivă la expresia postfixată\n", (char)ops);
 #endif
+				}
 			}
-			op = '$';		// rescris în buclă
 			break;
 		default:
 			err = true;
 			yyerror("operator invalid");
 		}
-	} while (('$' != op) && (EOF != op));
+	} while (('\n' != op) && (EOF != op));
 	return 0;
 }
