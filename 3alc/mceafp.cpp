@@ -36,6 +36,7 @@ char *nume;			// nume program
 FILE *fisier;
 int nrlin = 0;			// numărul liniei curente
 int nrcol;			// numărul coloanei curente
+int nrterm;			// număr termeni (cod ASM)
 
 struct operand yylval;		// ultimul operand citit din expresie
 
@@ -58,6 +59,7 @@ int main(int argc, char *argv[])
 		return errno;
 	}
 
+	yylval.id = 0;		// întotdeauna operand, nu termen
 	// extrage câte o linie și analizează expresia aritmetică
 	while (!feof(fisier)) {
 		++nrlin;
@@ -133,7 +135,7 @@ int yylex(void)
 
 
 // calculează o singură operație aritmetică
-int yycalc(int op)
+int yycalc(int op, FILE *fisier)
 {
 	struct operand nr1, nr2;		// operanzi
 	struct operand rez;			// rezultat evaluare expresie
@@ -145,24 +147,40 @@ int yycalc(int op)
 	nr2 = snr.top(); snr.pop();
 	nr1 = snr.top(); snr.pop();
 
+	if (0 == nr1.id)
+		fprintf(fisier, "LOD %lg\n", nr1.val);
+	else
+		fprintf(fisier, "LOD T%d\n", nr1.id);
+
 	switch (op) {
 	case '+':
 		rez.val = nr1.val + nr2.val;
+		fprintf(fisier, "ADD");
 		break;
 	case '-':
 		rez.val = nr1.val - nr2.val;
+		fprintf(fisier, "SUB");
 		break;
 	case '*':
 		rez.val = nr1.val * nr2.val;
+		fprintf(fisier, "MUL");
 		break;
 	case '/':
 		rez.val = nr1.val / nr2.val;
+		fprintf(fisier, "DIV");
 		break;
 	default:
 		yyerror("operator invalid");
 		return 3;
 	}
+	if (0 == nr2.id)
+		fprintf(fisier, " %lg\n", nr2.val);
+	else
+		fprintf(fisier, " T%d\n", nr2.id);
+
+	rez.id = ++nrterm;
 	snr.push(rez);
+	fprintf(fisier, "STO T%d\n\n", rez.id);
 #ifndef NINFO
 	printf(":: %lg %c %lg = %lg\n", nr1.val, (char)op, nr2.val, rez.val);
 #endif
@@ -179,8 +197,18 @@ bool yyexfp(void)
 	int ops;			// operatorul din vârful stivei
 	bool err = false;		// cel puțin o eroare
 	bool gasit;			// găsit pereche ()
+	FILE *fasm;			// codul „assembler” generat
+	char nasm[20];
+
+	sprintf(nasm, "exp%d.asm", nrlin);
+	fasm = fopen(nasm, "w+");
+	if (NULL == fasm) {
+		fprintf(stderr, "%s: eroare: fișierul «%s» nu a putut fi deschis pentru scriere\n", nume, nasm);
+		return errno;
+	}
 
 	nrcol = 0;
+	nrterm = 0;
 	sirexp.clear();			// eliberează memoria ocupată
 
 	// construiesc expresia în forma postfixă
@@ -224,7 +252,7 @@ bool yyexfp(void)
 #ifndef NDEBUG
 				printf("~ mutat %c din stivă la expresia postfixă\n", (char)ops);
 #endif
-				if (!err && yycalc(ops))
+				if (!err && yycalc(ops, fasm))
 					err = true;		// eroare sintactică
 			}
 #ifndef NDEBUG
@@ -249,7 +277,7 @@ bool yyexfp(void)
 #ifndef NDEBUG
 					printf("~ mutat %c din stivă la expresia postfixă\n", (char)ops);
 #endif
-					if (!err && yycalc(ops))
+					if (!err && yycalc(ops, fasm))
 						err = true;		// eroare sintactică
 				}
 			}
@@ -273,7 +301,7 @@ bool yyexfp(void)
 #ifndef NDEBUG
 					printf("~ mutat %c din stivă la expresia postfixă\n", (char)ops);
 #endif
-					if (!err && yycalc(ops))
+					if (!err && yycalc(ops, fasm))
 						err = true;		// eroare sintactică
 				}
 			}
@@ -288,5 +316,6 @@ bool yyexfp(void)
 		err = true;		// eroare sintactică
 		yyerror("lipsește cel puțin un operand");
 	}
+	fclose(fasm);			// închide fișierul ASM
 	return !err;
 }
