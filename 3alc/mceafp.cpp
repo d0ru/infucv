@@ -1,6 +1,6 @@
 /**
  * Mini compilator pentru expresii aritmetice simple.
- * (reprezentare în forma poloneză sau postfixată)
+ * (reprezentare în forma poloneză sau postfixă)
  *
  * Operanzi: numere întregi sau reale
  * Operatori:  +  -  *  /
@@ -20,7 +20,7 @@
 using namespace std;
 
 stack<double> snr;		// stiva temporară cu operanzi
-stack<int> stiva;		// stiva temporară cu operatori
+stack<int> sop;			// stiva temporară cu operatori
 string sirexp;			// expresia în forma postfixă
 
 char *nume;			// nume program
@@ -61,8 +61,8 @@ int main(int argc, char *argv[])
 
 		while (!snr.empty())		// golește stiva cu operanzi
 			snr.pop();
-		while (!stiva.empty())		// golește stiva cu operatori
-			stiva.pop();
+		while (!sop.empty())		// golește stiva cu operatori
+			sop.pop();
 	};
 	return 0;
 }
@@ -165,7 +165,7 @@ int yycalc(int op)
 bool yyexfp(void)
 {
 	char yylstr[200];
-	int op;				// operatorul citit (sau paranteză)
+	int opc;			// operatorul citit (sau paranteză)
 	int ops;			// operatorul din vârful stivei
 	bool err = false;		// cel puțin o eroare
 	bool gasit;			// găsit pereche ()
@@ -173,16 +173,16 @@ bool yyexfp(void)
 	nrcol = 0;
 	sirexp.clear();			// eliberează memoria ocupată
 
-	// construiesc expresia în forma postfixată
+	// construiesc expresia în forma postfixă
 	do {
-		op = yylex();		// analiza lexicală
+		opc = yylex();		// analiza lexicală
 #ifndef NDEBUG
-		//printf("~ yylex -> %d\n", op);
+		//printf("~ yylex -> %d\n", opc);
 #endif
-		switch (op) {
+		switch (opc) {
 		case 0:
 #ifndef NDEBUG
-			printf("~ adaug %lg la expresia postfixată\n", yylval);
+			printf("~ adaug %lg la expresia postfixă\n", yylval);
 #endif
 			snr.push(yylval);
 			sprintf(yylstr, " %lg", yylval);
@@ -193,40 +193,40 @@ bool yyexfp(void)
 			break;
 		case '(':
 #ifndef NDEBUG
-			printf("~ adaug %c în stivă\n", (char)op);
+			printf("~ adaug %c în stivă\n", (char)opc);
 #endif
-			stiva.push(op);
+			sop.push(opc);
 			break;
 		case '+':
 		case '-':
 		case '*':
 		case '/':
-			while (!stiva.empty()) {
-				ops = stiva.top();
+			while (!sop.empty()) {
+				ops = sop.top();
 #ifndef NDEBUG
-				printf("~ compar op%c cu ops%c\n", (char)op, (char)ops);
+				printf("~ compar opc%c cu ops%c\n", (char)opc, (char)ops);
 #endif
-				if (prop(op) > prop(ops))
+				if (prop(opc) > prop(ops))
 					break;
-				stiva.pop();
+				sop.pop();
 				sirexp += " ";
 				sirexp += ops;		// banda de ieșire
 #ifndef NDEBUG
-				printf("~ mutat %c din stivă la expresia postfixată\n", (char)ops);
+				printf("~ mutat %c din stivă la expresia postfixă\n", (char)ops);
 #endif
 				if (!err && yycalc(ops))
 					err = true;		// eroare sintactică
 			}
 #ifndef NDEBUG
-			printf("~ adaug %c în stivă\n", (char)op);
+			printf("~ adaug %c în stivă\n", (char)opc);
 #endif
-			stiva.push(op);
+			sop.push(opc);
 			break;
 		case ')':
 			gasit = false;
-			while (!stiva.empty()) {
-				ops = stiva.top();
-				stiva.pop();
+			while (!sop.empty()) {
+				ops = sop.top();
+				sop.pop();
 				if ('(' == ops) {
 #ifndef NDEBUG
 					printf("~ eliminat pereche paranteze ()\n");
@@ -237,7 +237,7 @@ bool yyexfp(void)
 					sirexp += " ";
 					sirexp += ops;		// banda de ieșire
 #ifndef NDEBUG
-					printf("~ mutat %c din stivă la expresia postfixată\n", (char)ops);
+					printf("~ mutat %c din stivă la expresia postfixă\n", (char)ops);
 #endif
 					if (!err && yycalc(ops))
 						err = true;		// eroare sintactică
@@ -251,9 +251,9 @@ bool yyexfp(void)
 		case EOF:
 		case '\n':
 			// am terminat de prelucrat banda de intrare
-			while (!stiva.empty()) {
-				ops = stiva.top();
-				stiva.pop();
+			while (!sop.empty()) {
+				ops = sop.top();
+				sop.pop();
 				if ('(' == ops) {
 					err = true;		// eroare sintactică
 					yyerror("'(' fără pereche");
@@ -261,7 +261,7 @@ bool yyexfp(void)
 					sirexp += " ";
 					sirexp += ops;		// banda de ieșire
 #ifndef NDEBUG
-				printf("~ mutat %c din stivă la expresia postfixată\n", (char)ops);
+					printf("~ mutat %c din stivă la expresia postfixă\n", (char)ops);
 #endif
 					if (!err && yycalc(ops))
 						err = true;		// eroare sintactică
@@ -272,7 +272,7 @@ bool yyexfp(void)
 			err = true;		// eroare semantică
 			yyerror("operand sau operator invalid");
 		}
-	} while (('\n' != op) && (EOF != op));
+	} while (('\n' != opc) && (EOF != opc));
 
 	if (!sirexp.empty() && (snr.size() != 1)) {
 		err = true;		// eroare sintactică
