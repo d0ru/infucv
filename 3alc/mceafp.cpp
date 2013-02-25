@@ -19,12 +19,12 @@
 #include <string>
 using namespace std;
 
-stack<int> stiva;
-string sirexp;
+stack<double> snr;		// stiva temporară cu operanzi
+stack<int> stiva;		// stiva temporară cu operatori
+string sirexp;			// expresia în forma postfixă
 
 char *nume;			// nume program
 FILE *fisier;
-bool err;			// cel puțin o eroare
 int nrlin = 0;			// numărul liniei curente
 int nrcol;			// numărul coloanei curente
 
@@ -32,7 +32,7 @@ double yylval;			// operandul din stânga
 
 void yyerror(char const *mesaj);
 int yylex(void);		// analiza lexicală ↦ atom
-int yyexfp(void);		// expresie ↦ forma postfixată
+bool yyexfp(void);		// expresie ↦ forma postfixă
 
 
 // mini compilator expresii aritmetice simple
@@ -52,13 +52,17 @@ int main(int argc, char *argv[])
 	// extrage câte o linie și analizează expresia aritmetică
 	while (!feof(fisier)) {
 		++nrlin;
-		yyexfp();
-
-		if (!err) {
+		if (yyexfp()) {
 			if (!sirexp.empty())
-				printf("%d:%s\n\n", nrlin, sirexp.c_str());
-		} else
-			fputc('\n', stdout);
+				printf("%d:%s  (%lg)\n\n", nrlin, sirexp.c_str(), snr.top());
+		} else {
+			putchar('\n');		// o linie liberă între expresii
+		}
+
+		while (!snr.empty())		// golește stiva cu operanzi
+			snr.pop();
+		while (!stiva.empty())		// golește stiva cu operatori
+			stiva.pop();
 	};
 	return 0;
 }
@@ -119,16 +123,54 @@ int yylex(void)
 }
 
 
-// expresie ↦ forma postfixată
-int yyexfp(void)
+// calculează o singură operație aritmetică
+int yycalc(int op)
+{
+	double nr1, nr2;		// operanzi
+	double rez;			// rezultat evaluare expresie
+
+	if (snr.size() < 2) {
+		yyerror("lipsește cel puțin un operand");
+		return 2;
+	}
+	nr2 = snr.top(); snr.pop();
+	nr1 = snr.top(); snr.pop();
+	switch (op) {
+	case '+':
+		rez = nr1 + nr2;
+		break;
+	case '-':
+		rez = nr1 - nr2;
+		break;
+	case '*':
+		rez = nr1 * nr2;
+		break;
+	case '/':
+		rez = nr1 / nr2;
+		break;
+	default:
+		yyerror("operator invalid");
+		return 3;
+	}
+	snr.push(rez);
+#ifndef NINFO
+	printf(":: %lg %c %lg = %lg\n", nr1, (char)op, nr2, rez);
+#endif
+
+	return 0;
+}
+
+
+// expresie ↦ forma postfixă
+bool yyexfp(void)
 {
 	char yylstr[200];
 	int op;				// operatorul citit (sau paranteză)
 	int ops;			// operatorul din vârful stivei
+	bool err = false;		// cel puțin o eroare
 	bool gasit;			// găsit pereche ()
 
 	nrcol = 0;
-	err = false;
 	sirexp.clear();			// eliberează memoria ocupată
 
 	// construiesc expresia în forma postfixată
@@ -142,6 +184,7 @@ int yyexfp(void)
 #ifndef NDEBUG
 			printf("~ adaug %lg la expresia postfixată\n", yylval);
 #endif
+			snr.push(yylval);
 			sprintf(yylstr, " %lg", yylval);
 			sirexp += yylstr;
 #ifndef NINFO
@@ -171,6 +214,8 @@ int yyexfp(void)
 #ifndef NDEBUG
 				printf("~ mutat %c din stivă la expresia postfixată\n", (char)ops);
 #endif
+				if (!err && yycalc(ops))
+					err = true;		// eroare sintactică
 			}
 #ifndef NDEBUG
 			printf("~ adaug %c în stivă\n", (char)op);
@@ -194,6 +239,8 @@ int yyexfp(void)
 #ifndef NDEBUG
 					printf("~ mutat %c din stivă la expresia postfixată\n", (char)ops);
 #endif
+					if (!err && yycalc(ops))
+						err = true;		// eroare sintactică
 				}
 			}
 			if (!gasit) {
@@ -216,13 +263,20 @@ int yyexfp(void)
 #ifndef NDEBUG
 				printf("~ mutat %c din stivă la expresia postfixată\n", (char)ops);
 #endif
+					if (!err && yycalc(ops))
+						err = true;		// eroare sintactică
 				}
 			}
 			break;
 		default:
-			err = true;
-			yyerror("operator invalid");
+			err = true;		// eroare semantică
+			yyerror("operand sau operator invalid");
 		}
 	} while (('\n' != op) && (EOF != op));
-	return 0;
+
+	if (!sirexp.empty() && (snr.size() != 1)) {
+		err = true;		// eroare sintactică
+		yyerror("lipsește cel puțin un operand");
+	}
+	return !err;
 }
