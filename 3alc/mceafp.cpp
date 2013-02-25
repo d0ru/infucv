@@ -2,12 +2,16 @@
  * Mini compilator pentru expresii aritmetice simple.
  * (reprezentare în forma poloneză sau postfixă)
  *
- * Operanzi: numere întregi sau reale
- * Operatori:  +  -  *  /
+ * Operanzi: numere (pozitive) întregi sau cu virgulă
+ * Operatori binari:  +  -  *  /
  */
 
 #define NDEBUG
 #define NINFO
+
+#ifdef NINFO
+#  define NDEBUG
+#endif
 
 #include <errno.h>
 #include <stdbool.h>
@@ -19,7 +23,12 @@
 #include <string>
 using namespace std;
 
-stack<double> snr;		// stiva temporară cu operanzi
+struct operand {
+	double val;		// valoare operand (sau termen)
+	int id;			// operand (0) sau termen (1..)
+};
+
+stack<struct operand> snr;	// stiva temporară cu operanzi
 stack<int> sop;			// stiva temporară cu operatori
 string sirexp;			// expresia în forma postfixă
 
@@ -28,7 +37,7 @@ FILE *fisier;
 int nrlin = 0;			// numărul liniei curente
 int nrcol;			// numărul coloanei curente
 
-double yylval;			// operandul din stânga
+struct operand yylval;		// ultimul operand citit din expresie
 
 void yyerror(char const *mesaj);
 int yylex(void);		// analiza lexicală ↦ atom
@@ -40,7 +49,7 @@ int main(int argc, char *argv[])
 {
 	nume = argv[0];
 	if (argc < 2)
-		fisier = stdin;			// citire de la consolă
+		fisier = stdin;		// citire de la consolă
 	else
 		fisier = fopen(argv[1], "r");
 
@@ -54,7 +63,7 @@ int main(int argc, char *argv[])
 		++nrlin;
 		if (yyexfp()) {
 			if (!sirexp.empty())
-				printf("%d:%s  (%lg)\n\n", nrlin, sirexp.c_str(), snr.top());
+				printf("%d:%s  (%lg)\n\n", nrlin, sirexp.c_str(), snr.top().val);
 		} else {
 			putchar('\n');		// o linie liberă între expresii
 		}
@@ -116,7 +125,7 @@ int yylex(void)
 	// citește un număr pozitiv
 	if ('.' == c || isdigit(c)) {
 		ungetc(c, fisier);
-		fscanf(fisier, "%lf", &yylval);
+		fscanf(fisier, "%lf", &yylval.val);
 		return 0;
 	}
 	return c;		// returnează caracterul citit
@@ -126,8 +135,8 @@ int yylex(void)
 // calculează o singură operație aritmetică
 int yycalc(int op)
 {
-	double nr1, nr2;		// operanzi
-	double rez;			// rezultat evaluare expresie
+	struct operand nr1, nr2;		// operanzi
+	struct operand rez;			// rezultat evaluare expresie
 
 	if (snr.size() < 2) {
 		yyerror("lipsește cel puțin un operand");
@@ -135,18 +144,19 @@ int yycalc(int op)
 	}
 	nr2 = snr.top(); snr.pop();
 	nr1 = snr.top(); snr.pop();
+
 	switch (op) {
 	case '+':
-		rez = nr1 + nr2;
+		rez.val = nr1.val + nr2.val;
 		break;
 	case '-':
-		rez = nr1 - nr2;
+		rez.val = nr1.val - nr2.val;
 		break;
 	case '*':
-		rez = nr1 * nr2;
+		rez.val = nr1.val * nr2.val;
 		break;
 	case '/':
-		rez = nr1 / nr2;
+		rez.val = nr1.val / nr2.val;
 		break;
 	default:
 		yyerror("operator invalid");
@@ -154,7 +164,7 @@ int yycalc(int op)
 	}
 	snr.push(rez);
 #ifndef NINFO
-	printf(":: %lg %c %lg = %lg\n", nr1, (char)op, nr2, rez);
+	printf(":: %lg %c %lg = %lg\n", nr1.val, (char)op, nr2.val, rez.val);
 #endif
 
 	return 0;
@@ -182,10 +192,10 @@ bool yyexfp(void)
 		switch (opc) {
 		case 0:
 #ifndef NDEBUG
-			printf("~ adaug %lg la expresia postfixă\n", yylval);
+			printf("~ adaug %lg la expresia postfixă\n", yylval.val);
 #endif
 			snr.push(yylval);
-			sprintf(yylstr, " %lg", yylval);
+			sprintf(yylstr, " %lg", yylval.val);
 			sirexp += yylstr;
 #ifndef NINFO
 			printf("::%s\n", sirexp.c_str());
