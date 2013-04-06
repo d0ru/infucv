@@ -1,5 +1,6 @@
 /**
- * Algoritmi genetici — cromozom.
+ * Algoritmi genetici — cromozom, codificare binară.
+ * - fiecare genă este codificată pe un singur bit
  */
 
 #include <stdlib.h>
@@ -39,6 +40,7 @@ crmz::crmz(int nrgene, int idgene)
 crmz::~crmz()
 {
 	delete g;
+	g = NULL;
 #ifndef NDEBUG
 	cout << "dtor crmz(" << nr
 	     << "," << id
@@ -74,6 +76,9 @@ crmz::crmz(const crmz& cr)
 // atribuire
 crmz& crmz::operator=(const crmz& cr)
 {
+	if (this == &cr)	// auto atribuire
+		return *this;
+
 	if (g != NULL)		// eliberează șirul vechi
 		delete g;
 
