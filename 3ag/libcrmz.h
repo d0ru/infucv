@@ -1,5 +1,6 @@
 /**
- * Algoritmi genetici — cromozom.
+ * Algoritmi genetici — cromozom, codificare binară.
+ * - fiecare genă este codificată pe un singur bit
  */
 
 #ifndef INFUCV_CRMZ
@@ -18,13 +19,13 @@ protected:
 	unsigned char *g;	// șir de gene pe biți
 public:
 	crmz(int nrgene = 0, int idgene = 0);
-	virtual ~crmz();
+	~crmz();
 	crmz(const crmz&);	// ctor copiere
 
 	int getId(void) { return id; };
 	void init(void);	// inițializare aleatoare
 
-	virtual crmz& operator=(const crmz&);
+	crmz& operator=(const crmz&);
 	friend std::ostream& operator<<(std::ostream&, const crmz&);
 };
 
