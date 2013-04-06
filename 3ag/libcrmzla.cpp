@@ -74,7 +74,6 @@ void crmzla::readg(const char *mesaj)
 void crmzla::decodg(const char *mesaj)
 {
 	int *pt;		// traseu decodificat
-	int *pg;
 	int i, u, v;		// muchia [u,v]
 
 	if (nr <= 0)		// invalid
