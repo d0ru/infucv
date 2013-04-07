@@ -171,3 +171,58 @@ class CrmzCA(Crmz):
             self.g[u-1] = v-1   # conexiune [u,v]
             u = v               # continuare
 
+
+class CrmzCO(Crmz):
+    """
+    CrmzCO — cromozom în codificare ordinală
+    * fiecare genă este codificată printr-un număr întreg
+    * gena „i” conține un număr „j”, cu j ∈ [1, n-i+1]
+      - „n” reprezintă cardinalul elementelor
+      - prima condiție de validare este ca fiecare genă să fie unică, adică
+        nu există două apariții ale aceluiași element în cromozom
+      - toate elementele au valori cuprinse între 1 și „n”
+      - „j” este cardinalul elementului conectat din punctul „i”
+    Legături:   1→2→4→3→8→5→9→6→7
+    Codificare: 1 1 2 1 4 1 3 1 1
+    """
+    def __init__(self, nr_gene = 0, id = None):
+        super(CrmzCO, self).__init__(id)
+        if nr_gene > 0:
+            self.g = [random.randint(0, nr_gene - i) for i in range(1, nr_gene+1)]
+
+    def traseu(self):
+        """
+        Decodifică traseul sub forma de conexiuni secvențiale.
+        """
+        if not self.g:
+            return ''
+
+        gord = range(1, len(self.g)+1)  # „g” ordonat
+        gstr = [str(gord[self.g[0]])]   # primul element
+        del gord[self.g[0]]
+        try:
+            for i in self.g[1:]:
+                gstr += [' → ' + str(gord[i])]
+                del gord[i]
+        except IndexError:
+            print('E: traseu invalid: gord[%d] nu există!!' % i)
+
+        sir = ''.join(gstr)
+        del gstr
+        return sir
+
+    def reset(self, *x):
+        """ Inițializare neinteractivă cromozom.
+        Se acceptă un număr variabil de parametrii — traseu sau conexiuni.
+        Toate elementele sunt din intervalul [1..n], unde n = dimensiune.
+        """
+        if self.g:
+            del self.g
+            self.g = []
+
+        gord = range(1, len(x)+1)   # „g” ordonat
+        for i in x:
+            k = gord.index(i)   # al câtelea element este „i”?
+            del gord[k]
+            self.g.append(k)    # adaug index la codificare
+
