@@ -34,6 +34,24 @@ class Crmz(object):
         del gstr
         return sir
 
+    def sirint(self, unu = False, sep = ' '):
+        """
+        Formează un șir cu toate genele în forma codificată,
+        separate printr-un șir dat.
+        """
+        if not self.g:
+            return ''
+
+        if unu:
+            start = 1       # reprezentare internă de la 0, externă de la 1
+        else:
+            start = 0       # nici o diferență de reprezentare
+        gstr = [str(self.g[0]+start)]
+        gstr += [sep + str(i+start) for i in self.g[1:]]
+        sir = ''.join(gstr)
+        del gstr
+        return sir
+
 
 class CrmzCB(Crmz):
     """ CRMZCB — cromozom în codificare binară
@@ -112,26 +130,13 @@ class CrmzCA(Crmz):
     CrmzCA — cromozom în codificare prin adiacență
     * fiecare genă este codificată printr-un număr întreg
     * gena „i” conține numărul „j” dacă există o muchie sau conexiune [i,j]
-    Legături:   1 2 4 3 8 5 9 6 7
+    Legături:   1→2→4→3→8→5→9→6→7
     Codificare: 2 4 8 3 9 7 1 5 6
     """
     def __init__(self, nr_gene = 0, id = None):
         super(CrmzCA, self).__init__(id)
         if nr_gene > 0:
             self.g = random.sample(range(nr_gene), nr_gene)
-
-    def sir(self, start = 0, final = None):
-        """
-        Formează un șir cu toate genele în forma codificată.
-        """
-        if not self.g:
-            return ''
-
-        gstr = [str(self.g[0]+1)]
-        gstr += [', ' + str(i+1) for i in self.g[1:]]
-        sir = ''.join(gstr)
-        del gstr
-        return sir
 
     def traseu(self):
         """
