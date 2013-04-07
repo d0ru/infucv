@@ -10,8 +10,8 @@ import crmz
 
 def main():
     cr = crmz.CrmzCR(4)
-    cr.setx((-3, 12.1, '010001001011010000'),
-            (4.1, 5.8, '111110010100010'))
+    cr.reset((-3, 12.1, '010001001011010000'),
+             (4.1, 5.8, '111110010100010'))
     print('cr#%d: %d variabile, precizie %d cifre zecimale' % (cr.id, len(cr.ln), cr._p))
     f = 0
     for i, l in enumerate(cr.ln):

@@ -47,9 +47,9 @@ class CrmzCB(Crmz):
 class CrmzCR(Crmz):
     """ CRMZCR — cromozom în codificare reală
     * fiecare cromozom are asociat una sau mai multe variabile
+    * fiecare genă este codificată binar (0 sau 1)
     * f(x1,x2,..xn), xi ∈ [ai,bi] ⊂ R cu i=1,n
     * _p: precizia variabilelor, nr. de zecimale exacte
-    * fiecare variabilă este codificată binar (0 sau 1)
     """
     _p = 0      # precizia de zecimale exacte
     ab = []     # (ai,bi) pentru fiecare variabilă „i”
@@ -75,15 +75,23 @@ class CrmzCR(Crmz):
         else:
             self.g += [random.randint(0,1) for i in range(li)]
 
-    def setx(self, *x):
+    def reset(self, *x):
         """
         Inițializare neinteractivă cromozom.
         Toate variabilelor sunt tupluri de forma (ai, bi, si), unde
         * [ai, bi] este intervalul de valori ale variabilei xi
         * iar 'si' este un șir ce reprezinta codificarea binară (01)
         """
-        if self.ab: del self.ab
-        if self.ln: del self.ln
+        if self.ab:
+            del self.ab
+            self.ab = []
+        if self.ln:
+            del self.ln
+            self.ln = []
+        if self.g:
+            del self.g
+            self.g = []
+
         # fiecare variabilă xi este un tuplu de 3 elemente
         for (ai, bi, si) in x:
             self._advar(ai, bi, si.strip())
