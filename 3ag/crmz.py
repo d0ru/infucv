@@ -105,3 +105,64 @@ class CrmzCR(Crmz):
         si = sum(self.ln[:i])   # prima genă din cromozom pentru xi
         zi = int(self.sir(si, si+li), 2)    # numărul zecimal
         return ai + zi * (bi - ai) / (2**li - 1)
+
+
+class CrmzCA(Crmz):
+    """
+    CrmzCA — cromozom în codificare prin adiacență
+    * fiecare genă este codificată printr-un număr întreg
+    * gena „i” conține numărul „j” dacă există o muchie sau conexiune [i,j]
+    Legături:   1 2 4 3 8 5 9 6 7
+    Codificare: 2 4 8 3 9 7 1 5 6
+    """
+    def __init__(self, nr_gene = 0, id = None):
+        super(CrmzCA, self).__init__(id)
+        if nr_gene > 0:
+            self.g = random.sample(range(nr_gene), nr_gene)
+
+    def sir(self, start = 0, final = None):
+        """
+        Formează un șir cu toate genele în forma codificată.
+        """
+        if not self.g:
+            return ''
+
+        gstr = [str(self.g[0]+1)]
+        gstr += [', ' + str(i+1) for i in self.g[1:]]
+        sir = ''.join(gstr)
+        del gstr
+        return sir
+
+    def traseu(self):
+        """
+        Decodifică traseul sub forma de conexiuni secvențiale.
+        """
+        if not self.g:
+            return ''
+
+        gstr = ['1']        # primul element
+        u = 0
+        v = self.g[0]       # prima conexiune
+        while v != 0:
+            gstr += [' → ' + str(v+1)]
+            u = v           # continuare
+            v = self.g[u]
+        sir = ''.join(gstr)
+        del gstr
+        return sir
+
+    def reset(self, *x):
+        """ Inițializare neinteractivă cromozom.
+        Se acceptă un număr variabil de parametrii — traseu sau conexiuni.
+        Toate elementele sunt din intervalul [1..n], unde n = dimensiune.
+        """
+        if self.g:
+            del self.g
+            self.g = []
+
+        self.g = [0 for i in range(len(x))]     # inițializare
+        u = x[0]                                # primul element
+        for v in x[1:]:
+            self.g[u-1] = v-1   # conexiune [u,v]
+            u = v               # continuare
+
