@@ -12,7 +12,13 @@ def rk4(yderiv1, yn, tn, dt):
     - yderiv1(y, t): funcția derivată de ordinul I al funcției „y(t)”
     - (yn, tn): valorile calculate la pasul N, inițial (y0, t0)
     - dt: pasul de timp (Δt)
-    Returnează valoarea aproximativă a funcției „y(t)” la pasul N+1.
+
+    Implementarea face abstracție de forma de reprezentare a valorii
+    „yn” ce a fost calculată la pasul N (ex. valoare, vector NumPy).
+
+    Returnează un tuplu de forma (yn_urm, tn_urm), unde:
+    - yn_urm: valoarea aproximativă a funcției „y(t)” la pasul N+1
+    - tn_urm: pasul de timp asociat valorii „yn_urm” la pasul N+1
     """
     dy1 = dt * yderiv1(yn,           tn)
     dy2 = dt * yderiv1(yn + dy1/2.0, tn + dt/2.0)
@@ -30,7 +36,13 @@ def rk4pasfix(yderiv1, y0, t0, dt, tmax):
     - (y0, t0): valorile inițiale la pasul 0 — „y(t0)”
     - dt: pasul de timp fix (Δt)
     - [t0, tmax]: intervalul pe care este definită funcția necunoscută
-    Returnează toate valorile funcției „y(t)” calculate cu RK4.
+
+    Implementarea face abstracție de forma de reprezentare a valorii
+    inițiale „y0” (ex. valoare numerică simplă, vector NumPy).
+
+    Returnează un tuplu de forma (yn, tn), unde:
+    - yn: o listă cu toate valorile funcției „y(t)” calculate cu RK4
+    - tn: o listă cu pașii de timp asociați valorilor din lista „yn”
     """
     yn, tn = [y0], [t0]
     yn_urm, tn_urm = y0, t0
