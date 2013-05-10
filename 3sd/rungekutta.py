@@ -52,3 +52,42 @@ def rk4pasfix(yderiv1, y0, t0, dt, tmax):
         yn.append(yn_urm)
         tn.append(tn_urm)
     return (yn, tn)
+
+
+def rk4pasvar(yderiv1, y0, t0, dt0, tmax, delta = 0.000001):
+    """
+    Metoda Runge-Kutta de ordinul 4 cu pas variabil.
+    - yderiv1(y, t): funcția derivată de ordinul I al funcției „y(t)”
+    - (y0, t0): valorile inițiale la pasul 0 — „y(t0)”
+    - dt0: pasul de timp inițial (Δt)
+    - [t0, tmax]: intervalul pe care este definită funcția necunoscută
+    - delta: eroarea de aproximare acceptată a sistemului RK4
+
+    Implementarea face abstracție de forma de reprezentare a valorii
+    inițiale „y0” (ex. valoare numerică simplă, vector NumPy).
+
+    Returnează un tuplu de forma (yn, tn), unde:
+    - yn: o listă cu toate valorile funcției „y(t)” calculate cu RK4
+    - tn: o listă cu pașii de timp asociați valorilor din lista „yn”
+    - en: o listă cu erorile asociate valorilor din lista „yn”
+    """
+    from numpy.linalg import norm
+    yn, tn, en, dt = [y0], [t0], [0], dt0
+    while tn[-1] < tmax:
+        while True:
+            (yn_urm, tn_urm)   = rk4(yderiv1, yn[-1],  tn[-1],  dt)
+            (yn_urm1, tn_urm1) = rk4(yderiv1, yn[-1],  tn[-1],  dt/2.0)
+            (yn_urm2, tn_urm2) = rk4(yderiv1, yn_urm1, tn_urm1, dt/2.0)
+            er = norm(yn_urm2 - yn_urm) * 16. / 15.     # 2^r=16
+            if 0 <= er <= 0.9 * delta:
+                break
+            else:
+                dt *= (0.9 * delta / er) ** 0.2         # 1/(r+1) = 0.2
+
+        yn_urm = yn_urm2 + (yn_urm2 - yn_urm) / 15.0
+        yn.append(yn_urm)
+        tn.append(tn_urm)
+        en.append(er)
+        if er > 0:
+            dt *= (delta / er) ** 0.2
+    return (yn, tn, en)
