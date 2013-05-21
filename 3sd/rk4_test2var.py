@@ -5,6 +5,7 @@ from rungekutta import rk4pasvar
 from math import exp, sqrt
 
 # I.CATANA
+# http://www.math.okstate.edu/~yqwang/teaching/math4513_fall11/Notes/rungekutta.pdf
 def yp(y, t):
     """ derivata parțială de ordinul I """
     return y - t**2 + 1
