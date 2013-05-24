@@ -82,12 +82,12 @@ def rk4pasvar(yderiv1, y0, t0, dt0, tmax, delta = 0.000001):
             if 0 <= er <= 0.9 * delta:
                 break
             else:
-                dt *= (0.9 * delta / er) ** 0.2         # 1/(r+1) = 0.2
+                dt *= (0.9 * delta / er) ** (1./5)      # 1/(r+1)
 
-        yn_urm = yn_urm2 + (yn_urm2 - yn_urm) / 15.0
+        yn_urm = yn_urm2 + (yn_urm2 - yn_urm) / 15.0    # 2^r - 1
         yn.append(yn_urm)
         tn.append(tn_urm)
         en.append(er)
         if er > 0:
-            dt *= (delta / er) ** 0.2
+            dt *= (delta / er) ** (1./4)                # 1/r
     return (yn, tn, en)
