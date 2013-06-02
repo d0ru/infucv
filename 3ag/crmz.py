@@ -77,6 +77,9 @@ class CrmzCR(Crmz):
         # precizia nu poate fi negativă
         if pr > 0:
             self._p = pr
+        # fiecare obiect trebuie să aibă o secvență unică
+        self.ab = []
+        self.ln = []
 
     def _advar(self, ai, bi, si = ''):
         """ Adaugă o variabilă în cromozom """
@@ -96,7 +99,7 @@ class CrmzCR(Crmz):
     def reset(self, *x):
         """
         Inițializare neinteractivă cromozom.
-        Toate variabilelor sunt tupluri de forma (ai, bi, si), unde
+        Toți parametrii  sunt tupluri de forma (ai, bi, si), unde
         * [ai, bi] este intervalul de valori ale variabilei xi
         * iar 'si' este un șir ce reprezinta codificarea binară (01)
         """
