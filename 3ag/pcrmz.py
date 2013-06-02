@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """ Algoritmi genetici — operații cu populații de cromozomi """
 
+from __future__ import print_function
 import random
 
 
@@ -41,7 +42,7 @@ class PCrmz(object):
             pc += pi
             ptai.append(pc)
         if info:
-            print('Probabilități cumulate: %s' % ptai)
+            print('S probabilități cumulate: %s' % ptai)
 
         crsel = []                  # lista cromozomilor selectați
         while len(crsel) < nc:
@@ -87,8 +88,8 @@ class PCrmz(object):
             self.cr[ic2].g[s:f] = tmp[:]                # cr2 ← tmp
             del tmp
         if info:
-            print ("%2d: %s" % (self.cr[ic1].id, self.cr[ic1].sir()))
-            print ("%2d: %s" % (self.cr[ic2].id, self.cr[ic2].sir()))
+            print("%2d: %s" % (self.cr[ic1].id, self.cr[ic1].sir()))
+            print("%2d: %s" % (self.cr[ic2].id, self.cr[ic2].sir()))
 
     def xbin(self, fadecv, nc=0, nt=0, info=False, selinfo=False):
         """ Încrucișarea binară a unui set aleator de cromozomi
