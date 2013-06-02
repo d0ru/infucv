@@ -53,3 +53,63 @@ class PCrmz(object):
                     print('- selectat cr#%d (fitnes %f) cu %f < %f' %
                             (ic+1, f[ic], na, ptai[ic]) )
         return crsel
+
+    def x2bin(self, ic1, ic2, nt=0, info=False):
+        """ Încrucișarea binară a doi cromozomi
+        - ic1: indexul primului cromozom în vectorul cr[]
+        - ic2: indexul cromozomului secund
+        - nt: numărul de tăieturi (implicit 20% din numărul de gene)
+
+        Metoda operează direct pe cromozomii părinți și îi
+        înlocuiește cu descendenții lor.
+        """
+        if nt <= 0:
+            nt = len(self.cr[0].g) // 5     # valoarea implicită
+
+        gtai = []                   # gene selectate pentru tăieturi
+        while len(gtai) < nt:
+            ri = random.randint(0, (len(self.cr[0].g) - 1))
+            if ri not in gtai:
+                gtai.append(ri)
+        gtai.sort()                 # sortează crescător tăieturile
+
+        # dacă ultima tăietură nu are pereche?
+        if nt % 2:
+            gtai.append(len(self.cr[0].g) - 1)   # implicit până la sfârșit
+        if info:
+            print('X2 gene selectate: %s' % gtai)
+
+        # interschimbă genele cromozomilor per tăietură [start, final]
+        for s, f in zip(gtai[0::2], gtai[1::2]):
+            f += 1                  # adjustare pentru tăietură listă
+            tmp = self.cr[ic1].g[s:f]                   # tmp ← cr1
+            self.cr[ic1].g[s:f] = self.cr[ic2].g[s:f]   # cr1 ← cr2
+            self.cr[ic2].g[s:f] = tmp[:]                # cr2 ← tmp
+            del tmp
+        if info:
+            print ("%2d: %s" % (self.cr[ic1].id, self.cr[ic1].sir()))
+            print ("%2d: %s" % (self.cr[ic2].id, self.cr[ic2].sir()))
+
+    def xbin(self, fadecv, nc=0, nt=0, info=False, selinfo=False):
+        """ Încrucișarea binară a unui set aleator de cromozomi
+        - fadecv(cr): funcția de adecvare (sau fitnes)
+        - fsel(fadecv, nc): funcția de selecție cromozomi
+        - nc: numărul de cromozomi selectați (implicit 50% din populație)
+        - nt: numărul de tăieturi (implicit 20% din numărul de gene)
+
+        Metoda operează direct pe populație și înlocuiește
+        cromozomii părinți cu descendenții lor.
+        """
+        crsel = self.sel(fadecv, nc, info=selinfo)  # selecție
+        if info:
+            print('X cromozomi selectați: %s' % crsel)
+
+        # se aleg aleator câte doi cromozomi din cei selectați
+        while len(crsel) > 1:
+            ri = random.randint(0, len(crsel)-1)
+            ic1 = crsel[ri]             # prim
+            del crsel[ri]
+            ri = random.randint(0, len(crsel)-1)
+            ic2 = crsel[ri]             # secund
+            del crsel[ri]
+            self.x2bin(ic1, ic2, nt, info=info)     # încrucișare
