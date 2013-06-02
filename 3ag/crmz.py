@@ -125,7 +125,7 @@ class CrmzCR(Crmz):
         li = self.ln[i]         # număr gene asociate variabilei xi
         si = sum(self.ln[:i])   # prima genă din cromozom pentru xi
         zi = int(self.sir(si, si+li), 2)    # numărul zecimal
-        return ai + zi * (bi - ai) / (2**li - 1)
+        return ai + zi * float(bi - ai) / (2**li - 1)
 
 
 class CrmzCA(Crmz):
