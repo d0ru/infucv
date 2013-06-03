@@ -123,17 +123,23 @@ class PCrmz(object):
         Metoda operează direct pe cromozom și înlocuiește
         genele ce au o probabilitate aleatoare ρ < pm.
         """
-        print('M2 gene selectate:', end='')
+        if info:
+            print('M2 gene selectate:', end='')
+
         for i in range(len(self.cr[ic].g)):
             rho = random.random()       # [0, 1)
             if rho < pm:
-                print(' %d' % i, end='')
                 if self.cr[ic].g[i]:    # =1
                     self.cr[ic].g[i] = 0
                 else:
                     self.cr[ic].g[i] = 1
-        print('')
-        print('%2d: %s' % (self.cr[ic].id, self.cr[ic].sir()))
+
+                if info:
+                    print(' %d' % i, end='')
+
+        if info:
+            print('')
+            print('%2d: %s' % (self.cr[ic].id, self.cr[ic].sir()))
 
     def mbin(self, fadecv, nc = 0, pm = 0.25, info=False, selinfo=False):
         """ Mutația binară tare a unui set aleator de cromozomi
