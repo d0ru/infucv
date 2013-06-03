@@ -13,7 +13,7 @@ def fx1(x):
     return -sin(x) / x
 
 a1, b1 = -4, 4
-xmin = 9.76996262e-15
+xmin = -3.55271368e-15
 fx1min = fx1(xmin)
 
 def adecv(cr):
