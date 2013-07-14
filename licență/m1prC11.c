@@ -1,10 +1,8 @@
-#include <stdio.h>
-
 int main(void)
 {
 	float x = 10;
 	int y = 7;
-	float t[] = { 3, 4, 1 };
+	float t[] = {3,4,1};
 	float *q = &x;
 	int *r = &y;
 	void *p;
