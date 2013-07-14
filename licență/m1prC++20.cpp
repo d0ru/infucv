@@ -11,7 +11,7 @@ public:
 		x = xi; y = yi;
 	}
 	void afis() {
-		cout << x << " " << y << " ";
+		cout << x " " << y;
 	}
 };
 
